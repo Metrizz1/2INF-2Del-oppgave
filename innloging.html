@@ -1,87 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login</title>
+  <title>Administratorinnlogging</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="card">
-    <section id="loginStep">
-      <h1>Admin Login</h1>
-      <p>Sign in with the admin account, then complete the second verification step.</p>
-
-      <div id="loginMessage" class="message"></div>
-
-      <form id="loginForm">
-        <div class="group">
-          <label for="username">Username</label>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            autocomplete="username"
-            placeholder="Enter admin username"
-            required
-          />
-        </div>
-
-        <div class="group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            placeholder="Enter password"
-            required
-          />
-        </div>
-
-        <button type="submit">Continue</button>
-      </form>
-
-      <div class="footer-note">
-        Demo admin: <strong>admin</strong> / <strong>Admin@123</strong>
-      </div>
-    </section>
-
-    <section id="twoFactorStep" class="hidden">
-      <h1>2-Factor Verification</h1>
-      <p>Enter the 6-digit verification code to continue.</p>
-
-      <div id="twoFactorMessage" class="message"></div>
-
-      <div class="code-box">
-        Demo code: <strong id="demoCode">482913</strong>
+  <main class="container">
+    <div class="card">
+      <div class="brand">
+        <h1>Administratorpanel</h1>
+        <p>Logg inn for å gå videre til bekreftelse med kode sendt på e-post.</p>
       </div>
 
-      <form id="twoFactorForm">
-        <div class="group">
-          <label for="otp">Verification Code</label>
-          <input
-            id="otp"
-            name="otp"
-            type="text"
-            inputmode="numeric"
-            maxlength="6"
-            placeholder="Enter 6-digit code"
-            required
-          />
-        </div>
+      <section id="login-section">
+        <h2>Innlogging</h2>
 
-        <button type="submit">Verify</button>
-        <button type="button" id="backButton" class="secondary">Back</button>
-      </form>
-    </section>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">E-postadresse</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="admin@example.com"
+              required
+            />
+          </div>
 
-    <section id="dashboardStep" class="hidden dashboard">
-      <h2>Welcome, Admin</h2>
-      <p>You have successfully completed login and 2-factor verification.</p>
-      <span class="tag">Admin Access Granted</span>
-      <button id="logoutButton" class="secondary">Log Out</button>
-    </section>
+          <div class="form-group">
+            <label for="password">Passord</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Skriv inn passord"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn primary">Logg inn</button>
+        </form>
+      </section>
+
+      <section id="otp-section" class="hidden">
+        <h2>Bekreftelseskode</h2>
+        <p class="section-text">
+          Skriv inn den 6-sifrede koden som ble sendt til e-postadressen din.
+        </p>
+
+        <form id="otp-form">
+          <div class="form-group">
+            <label for="otp">Bekreftelseskode</label>
+            <input
+              type="text"
+              id="otp"
+              name="otp"
+              maxlength="6"
+              inputmode="numeric"
+              placeholder="000000"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn primary">Bekreft kode</button>
+          <button type="button" id="back-btn" class="btn secondary">Tilbake</button>
+        </form>
+      </section>
+
+      <div id="message-box" class="message hidden"></div>
+    </div>
   </main>
 
   <script src="script.js"></script>
