@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="card">
+    <section id="loginStep">
+      <h1>Admin Login</h1>
+      <p>Sign in with the admin account, then complete the second verification step.</p>
+
+      <div id="loginMessage" class="message"></div>
+
+      <form id="loginForm">
+        <div class="group">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            placeholder="Enter admin username"
+            required
+          />
+        </div>
+
+        <div class="group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+
+        <button type="submit">Continue</button>
+      </form>
+
+      <div class="footer-note">
+        Demo admin: <strong>admin</strong> / <strong>Admin@123</strong>
+      </div>
+    </section>
+
+    <section id="twoFactorStep" class="hidden">
+      <h1>2-Factor Verification</h1>
+      <p>Enter the 6-digit verification code to continue.</p>
+
+      <div id="twoFactorMessage" class="message"></div>
+
+      <div class="code-box">
+        Demo code: <strong id="demoCode">482913</strong>
+      </div>
+
+      <form id="twoFactorForm">
+        <div class="group">
+          <label for="otp">Verification Code</label>
+          <input
+            id="otp"
+            name="otp"
+            type="text"
+            inputmode="numeric"
+            maxlength="6"
+            placeholder="Enter 6-digit code"
+            required
+          />
+        </div>
+
+        <button type="submit">Verify</button>
+        <button type="button" id="backButton" class="secondary">Back</button>
+      </form>
+    </section>
+
+    <section id="dashboardStep" class="hidden dashboard">
+      <h2>Welcome, Admin</h2>
+      <p>You have successfully completed login and 2-factor verification.</p>
+      <span class="tag">Admin Access Granted</span>
+      <button id="logoutButton" class="secondary">Log Out</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
