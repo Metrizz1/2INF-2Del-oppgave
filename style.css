@@ -56,6 +56,14 @@ h2 {
   line-height: 1.5;
 }
 
+.access-box {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 14px;
+}
+
 .form-group {
   margin-bottom: 16px;
 }
