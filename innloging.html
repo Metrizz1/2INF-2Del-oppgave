@@ -3,83 +3,229 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Administratorinnlogging</title>
+  <title>Adgangskontroll og alarm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="container">
-    <div class="card">
-      <div class="brand">
-        <h1>Administratorpanel</h1>
-        <p>Logg inn for å gå videre til bekreftelse med kode sendt på e-post.</p>
+  <div class="scene-glow" aria-hidden="true"></div>
+
+  <header id="app-topbar" class="topbar hidden">
+    <div class="topbar-left">
+      <p class="eyebrow">Adgangskontroll</p>
+      <h1>Skolebygg</h1>
+    </div>
+    <div class="topbar-right">
+      <p id="welcome-text" class="welcome">Bruker</p>
+      <span id="role-pill" class="pill">gjest</span>
+      <button id="logout-btn" class="btn ghost" type="button">Logg ut</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section id="auth-panel" class="panel auth-panel">
+      <div class="brand-block">
+        <p class="eyebrow">Demoinnlogging</p>
+        <h2>Trygg tilgang med 2FA</h2>
+        <p>
+          Logg inn med e-post og passord, bekreft med kode, og gå videre til dashboard,
+          logg, brukere og admin-verktøy.
+        </p>
       </div>
 
       <section id="login-section">
-        <h2>Innlogging</h2>
+        <h3>Innlogging</h3>
+        <form id="login-form" class="stack">
+          <label for="email">E-postadresse</label>
+          <input id="email" name="email" type="email" placeholder="kevin@example.com" required />
 
-        <form id="login-form">
-          <div class="form-group">
-            <label for="email">E-postadresse</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="admin@example.com"
-              required
-            />
-          </div>
+          <label for="password">Passord</label>
+          <input id="password" name="password" type="password" placeholder="Skriv inn passord" required />
 
-          <div class="form-group">
-            <label for="password">Passord</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Skriv inn passord"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn primary">Logg inn</button>
+          <button class="btn primary" type="submit">Send kode</button>
         </form>
+
+        <p class="hint">
+          Testkontoer: <strong>kevin@example.com</strong> (admin) eller <strong>emma@example.com</strong> (gjest). Passord: <strong>1234</strong>
+        </p>
       </section>
 
       <section id="otp-section" class="hidden">
-        <h2>Bekreftelseskode</h2>
-        <p class="section-text">
-          Skriv inn den 6-sifrede koden som ble sendt til e-postadressen din.
-        </p>
+        <h3>Bekreftelseskode</h3>
+        <p class="hint" id="otp-hint">Skriv inn 6-sifret kode fra e-post.</p>
 
-        <form id="otp-form">
-          <div class="form-group">
-            <label for="otp">Bekreftelseskode</label>
-            <input
-              type="text"
-              id="otp"
-              name="otp"
-              maxlength="6"
-              inputmode="numeric"
-              placeholder="000000"
-              required
-            />
+        <form id="otp-form" class="stack">
+          <label for="otp">Kode</label>
+          <input id="otp" name="otp" type="text" inputmode="numeric" maxlength="6" placeholder="000000" required />
+
+          <div class="button-row">
+            <button class="btn primary" type="submit">Logg inn</button>
+            <button id="back-btn" class="btn secondary" type="button">Tilbake</button>
           </div>
-
-          <button type="submit" class="btn primary">Bekreft kode</button>
-          <button type="button" id="back-btn" class="btn secondary">Tilbake</button>
         </form>
       </section>
 
-      <section id="dashboard-section" class="hidden">
-        <h2>Tilgang</h2>
-        <p id="greeting-text" class="section-text"></p>
-        <div class="access-box">
-          <strong>Rolle:</strong> <span id="role-text"></span>
+      <div id="auth-message" class="message hidden"></div>
+    </section>
+
+    <section id="app-panel" class="panel app-panel hidden">
+      <nav class="tab-nav" aria-label="Hovedmeny">
+        <button class="tab-btn active" data-view="dashboard" type="button">Dashboard</button>
+        <button class="tab-btn" data-view="log" type="button">Logg</button>
+        <button class="tab-btn" data-view="users" type="button">Brukere</button>
+        <button class="tab-btn" data-view="admin" type="button">Admin</button>
+      </nav>
+
+      <section id="view-dashboard" class="view active">
+        <div class="grid cards">
+          <article class="kpi">
+            <p>Alarmstatus</p>
+            <h3 id="alarm-status-text">-</h3>
+            <small id="alarm-status-meta">Sist endret: -</small>
+          </article>
+          <article class="kpi">
+            <p>Sist opplåst</p>
+            <h3 id="last-unlock-time">-</h3>
+            <small id="last-unlock-user">Bruker: -</small>
+          </article>
+          <article class="kpi">
+            <p>Sist deaktivert</p>
+            <h3 id="last-deactivate-time">-</h3>
+            <small id="last-deactivate-user">Bruker: -</small>
+          </article>
+          <article class="kpi">
+            <p>Hendelser (24t)</p>
+            <h3 id="events-last-day">0</h3>
+            <small>Opplåsinger og alarmhendelser</small>
+          </article>
+        </div>
+
+        <div class="grid split">
+          <article class="block">
+            <h3>Registrer hendelse</h3>
+            <form id="simulate-event-form" class="stack compact">
+              <label for="sim-card-id">Kort-ID</label>
+              <input id="sim-card-id" type="text" placeholder="7A3B21" required />
+
+              <label for="sim-action">Handling</label>
+              <select id="sim-action" required>
+                <option value="unlock_door">Låste opp dør</option>
+                <option value="deactivate_alarm">Deaktiverte alarm</option>
+                <option value="activate_alarm">Aktiverte alarm</option>
+              </select>
+
+              <label for="sim-room">Rom / sensor</label>
+              <input id="sim-room" type="text" placeholder="Inngang A" required />
+
+              <button class="btn ghost" type="submit">Legg til hendelse</button>
+            </form>
+          </article>
+
+          <article class="block">
+            <h3>Siste hendelser</h3>
+            <ul id="recent-open-list" class="recent-list"></ul>
+          </article>
         </div>
       </section>
 
-      <div id="message-box" class="message hidden"></div>
-    </div>
+      <section id="view-log" class="view">
+        <div class="toolbar">
+          <input id="log-search" type="search" placeholder="Søk navn eller handling" />
+          <select id="time-filter">
+            <option value="24h">Siste 24 timer</option>
+            <option value="week">Siste uke</option>
+            <option value="all">Alle hendelser</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Navn</th>
+                <th>Handling</th>
+                <th>Dato</th>
+                <th>Tid</th>
+              </tr>
+            </thead>
+            <tbody id="log-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-users" class="view">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Navn</th>
+                <th>Kort-ID</th>
+                <th>Rolle</th>
+                <th>E-post</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-admin" class="view">
+        <div id="admin-locked" class="access-note hidden">
+          Denne siden er kun tilgjengelig for admin.
+        </div>
+
+        <div id="admin-content">
+          <article class="block">
+            <h3>Legg til nytt kort</h3>
+            <form id="add-user-form" class="stack compact">
+              <label for="new-name">Navn</label>
+              <input id="new-name" type="text" placeholder="Nora" required />
+
+              <label for="new-card-id">Kort-ID</label>
+              <input id="new-card-id" type="text" placeholder="AB12CD" required />
+
+              <label for="new-role">Rolle</label>
+              <select id="new-role">
+                <option value="gjest">gjest</option>
+                <option value="admin">admin</option>
+              </select>
+
+              <label for="new-email">E-post</label>
+              <input id="new-email" type="email" placeholder="nora@example.com" required />
+
+              <button class="btn primary" type="submit">Legg til bruker</button>
+            </form>
+          </article>
+
+          <article class="block">
+            <h3>Administrer kort og navn</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Navn</th>
+                    <th>Kort-ID</th>
+                    <th>Rolle</th>
+                    <th>Handling</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div id="app-message" class="message hidden"></div>
+    </section>
   </main>
+
+  <aside id="welcome-popup" class="welcome-popup hidden" role="status" aria-live="polite">
+    <p id="welcome-popup-text">Hallo bruker</p>
+    <button id="welcome-popup-close" class="popup-close" type="button" aria-label="Lukk popup">Lukk</button>
+  </aside>
 
   <script src="script.js"></script>
 </body>
