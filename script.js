@@ -3,15 +3,22 @@
   appPanel: document.getElementById("app-panel"),
   topbar: document.getElementById("app-topbar"),
 
+  authSwitchButtons: Array.from(document.querySelectorAll(".auth-switch-btn")),
   loginSection: document.getElementById("login-section"),
+  signUpSection: document.getElementById("signup-section"),
   otpSection: document.getElementById("otp-section"),
   loginForm: document.getElementById("login-form"),
+  signUpForm: document.getElementById("signup-form"),
   otpForm: document.getElementById("otp-form"),
   backBtn: document.getElementById("back-btn"),
   otpHint: document.getElementById("otp-hint"),
 
   emailInput: document.getElementById("email"),
   passwordInput: document.getElementById("password"),
+  signUpNameInput: document.getElementById("signup-name"),
+  signUpEmailInput: document.getElementById("signup-email"),
+  signUpPasswordInput: document.getElementById("signup-password"),
+  signUpConfirmPasswordInput: document.getElementById("signup-confirm-password"),
   otpInput: document.getElementById("otp"),
 
   authMessage: document.getElementById("auth-message"),
@@ -113,6 +120,7 @@ const state = {
   currentUser: null,
   pendingAccount: null,
   activeView: "dashboard",
+  activeAuthView: "login",
   popupTimer: null
 };
 
@@ -150,6 +158,10 @@ function normalizeCardId(value) {
   return String(value || "").trim().toUpperCase();
 }
 
+function normalizeName(value) {
+  return String(value || "").trim().replace(/\s+/g, " ");
+}
+
 function toTitleCase(value) {
   const text = String(value || "").trim();
   if (!text) return "Ukjent";
@@ -181,6 +193,20 @@ function formatDate(value) {
 
 function formatTime(value) {
   return TIME_FORMATTER.format(value);
+}
+
+function generateUniqueCardId() {
+  let cardId = "";
+
+  do {
+    cardId = Math.random().toString(16).slice(2, 8).toUpperCase();
+  } while (state.users.some((user) => normalizeCardId(user.cardId) === cardId));
+
+  return cardId;
+}
+
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 
 function showMessage(element, text, type = "info") {
@@ -419,6 +445,21 @@ function renderAll() {
   renderAdmin();
 }
 
+function setAuthView(viewName) {
+  const safeView = viewName === "signup" ? "signup" : "login";
+  state.activeAuthView = safeView;
+
+  DOM.authSwitchButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.authView === safeView);
+  });
+
+  DOM.loginSection.classList.toggle("hidden", safeView !== "login");
+  DOM.signUpSection.classList.toggle("hidden", safeView !== "signup");
+  DOM.otpSection.classList.add("hidden");
+  state.pendingAccount = null;
+  DOM.otpForm.reset();
+}
+
 function setView(viewName) {
   state.activeView = viewName;
 
@@ -445,15 +486,14 @@ function showAuth() {
   DOM.appPanel.classList.add("hidden");
   DOM.topbar.classList.add("hidden");
 
-  DOM.loginSection.classList.remove("hidden");
-  DOM.otpSection.classList.add("hidden");
-
   hideWelcomePopup();
   hideMessage(DOM.authMessage);
   hideMessage(DOM.appMessage);
 
   DOM.loginForm.reset();
+  DOM.signUpForm.reset();
   DOM.otpForm.reset();
+  setAuthView("login");
 }
 
 function handleLoginSubmit(event) {
@@ -473,8 +513,57 @@ function handleLoginSubmit(event) {
   state.pendingAccount = account;
   DOM.loginSection.classList.add("hidden");
   DOM.otpSection.classList.remove("hidden");
-  DOM.otpHint.textContent = `Kode sendt til ${account.email}. Testkode: ${account.otp}`;
+  DOM.otpHint.textContent = `Kode sendt til ${account.email}. Bekreftelseskode: ${account.otp}`;
   showMessage(DOM.authMessage, "Kode sendt til e-post.", "success");
+}
+
+function handleSignUpSubmit(event) {
+  event.preventDefault();
+  hideMessage(DOM.authMessage);
+
+  const name = normalizeName(DOM.signUpNameInput.value);
+  const email = normalizeEmail(DOM.signUpEmailInput.value);
+  const password = DOM.signUpPasswordInput.value;
+  const confirmPassword = DOM.signUpConfirmPasswordInput.value;
+
+  if (name.length < 2) {
+    showMessage(DOM.authMessage, "Skriv inn et gyldig navn.", "error");
+    return;
+  }
+
+  if (password.length < 4) {
+    showMessage(DOM.authMessage, "Passordet må være minst 4 tegn.", "error");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    showMessage(DOM.authMessage, "Passordene er ikke like.", "error");
+    return;
+  }
+
+  if (state.accounts.some((account) => account.email === email)) {
+    showMessage(DOM.authMessage, "E-postadressen finnes allerede.", "error");
+    return;
+  }
+
+  const cardId = generateUniqueCardId();
+  const otp = generateOtp();
+  const account = {
+    email,
+    password,
+    otp,
+    name,
+    role: "gjest",
+    cardId
+  };
+
+  state.accounts.push(account);
+  state.users.push(mapAccountToUser(account));
+
+  DOM.signUpForm.reset();
+  DOM.emailInput.value = email;
+  setAuthView("login");
+  showMessage(DOM.authMessage, `Konto opprettet. Bekreftelseskode: ${otp}`, "success");
 }
 
 function handleOtpSubmit(event) {
@@ -513,13 +602,20 @@ function handleBackFromOtp() {
   hideMessage(DOM.authMessage);
   DOM.otpForm.reset();
   DOM.otpSection.classList.add("hidden");
-  DOM.loginSection.classList.remove("hidden");
+  setAuthView("login");
 }
 
 function handleLogout() {
   state.currentUser = null;
   state.pendingAccount = null;
   showAuth();
+}
+
+function handleAuthSwitch(event) {
+  const target = event.currentTarget;
+  const viewName = target.dataset.authView;
+  hideMessage(DOM.authMessage);
+  setAuthView(viewName);
 }
 
 function handleTabClick(event) {
@@ -655,7 +751,12 @@ function handleAdminTableClick(event) {
 }
 
 function bindEvents() {
+  DOM.authSwitchButtons.forEach((button) => {
+    button.addEventListener("click", handleAuthSwitch);
+  });
+
   DOM.loginForm.addEventListener("submit", handleLoginSubmit);
+  DOM.signUpForm.addEventListener("submit", handleSignUpSubmit);
   DOM.otpForm.addEventListener("submit", handleOtpSubmit);
   DOM.backBtn.addEventListener("click", handleBackFromOtp);
   DOM.logoutBtn.addEventListener("click", handleLogout);

@@ -27,12 +27,17 @@
   <main class="layout">
     <section id="auth-panel" class="panel auth-panel">
       <div class="brand-block">
-        <p class="eyebrow">Demoinnlogging</p>
-        <h2>Trygg tilgang med 2FA</h2>
+        <p class="eyebrow">Adgangskontroll</p>
+        <h2>Trygg tilgang med bekreftelseskode</h2>
         <p>
-          Logg inn med e-post og passord, bekreft med kode, og gå videre til dashboard,
-          logg, brukere og admin-verktøy.
+          Logg inn eller opprett en konto for tilgang til dashboard, logg, brukere
+          og admin-verktøy.
         </p>
+      </div>
+
+      <div class="auth-switch" role="tablist" aria-label="Autentisering">
+        <button id="show-login-btn" class="auth-switch-btn active" type="button" data-auth-view="login">Innlogging</button>
+        <button id="show-signup-btn" class="auth-switch-btn" type="button" data-auth-view="signup">Sign up</button>
       </div>
 
       <section id="login-section">
@@ -48,8 +53,27 @@
         </form>
 
         <p class="hint">
-          Testkontoer: <strong>kevin@example.com</strong> (admin) eller <strong>emma@example.com</strong> (gjest). Passord: <strong>1234</strong>
+          Midlertidig tilgang: <strong>kevin@example.com</strong> (admin) eller <strong>emma@example.com</strong> (gjest). Passord: <strong>1234</strong>
         </p>
+      </section>
+
+      <section id="signup-section" class="hidden">
+        <h3>Opprett konto</h3>
+        <form id="signup-form" class="stack">
+          <label for="signup-name">Navn</label>
+          <input id="signup-name" name="signup-name" type="text" placeholder="Skriv inn navn" required />
+
+          <label for="signup-email">E-postadresse</label>
+          <input id="signup-email" name="signup-email" type="email" placeholder="navn@example.com" required />
+
+          <label for="signup-password">Passord</label>
+          <input id="signup-password" name="signup-password" type="password" placeholder="Lag et passord" required />
+
+          <label for="signup-confirm-password">Bekreft passord</label>
+          <input id="signup-confirm-password" name="signup-confirm-password" type="password" placeholder="Skriv passordet igjen" required />
+
+          <button class="btn primary" type="submit">Opprett konto</button>
+        </form>
       </section>
 
       <section id="otp-section" class="hidden">

@@ -123,6 +123,40 @@ body {
   line-height: 1.55;
 }
 
+.auth-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 6px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.auth-switch-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 650;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.auth-switch-btn:hover {
+  color: #334155;
+  background: #ffffff;
+}
+
+.auth-switch-btn.active {
+  color: #1d4ed8;
+  background: #eaf1ff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
 h3 {
   margin: 0 0 14px;
   font-size: 1.07rem;
