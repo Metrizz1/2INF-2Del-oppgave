@@ -3,90 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adgangskontroll og alarm</title>
+  <title>SecureAccess — Adgangskontroll</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="scene-glow" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
 
   <header id="app-topbar" class="topbar hidden">
     <div class="topbar-left">
-      <p class="eyebrow">Adgangskontroll</p>
-      <h1>Skolebygg</h1>
+      <div class="logo">
+        <div class="logo-icon" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div>
+          <p class="eyebrow">SecureAccess</p>
+          <h1>Skolebygg</h1>
+        </div>
+      </div>
     </div>
     <div class="topbar-right">
-      <p id="welcome-text" class="welcome">Bruker</p>
-      <span id="role-pill" class="pill">gjest</span>
-      <button id="logout-btn" class="btn ghost" type="button">Logg ut</button>
+      <div class="user-info">
+        <span class="user-dot" aria-hidden="true"></span>
+        <p id="welcome-text" class="welcome">Bruker</p>
+        <span id="role-pill" class="pill">gjest</span>
+      </div>
+      <button id="theme-toggle-btn" class="theme-toggle" type="button" aria-label="Bytt tema">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <button id="logout-btn" class="btn ghost" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logg ut
+      </button>
     </div>
   </header>
 
   <main class="layout">
+
     <section id="auth-panel" class="panel auth-panel">
-      <div class="brand-block">
-        <p class="eyebrow">Adgangskontroll</p>
-        <h2>Trygg tilgang med bekreftelseskode</h2>
-        <p>
-          Logg inn eller opprett en konto for tilgang til dashboard, logg, brukere
-          og admin-verktøy.
-        </p>
+      <div class="auth-brand">
+        <div class="auth-logo">
+          <div class="logo-icon large" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div>
+            <p class="eyebrow">SecureAccess v2</p>
+            <h2>Adgangskontroll</h2>
+          </div>
+        </div>
+        <p class="auth-desc">Logg inn for tilgang til dashboard, hendelseslogg, brukere og admin-verktøy.</p>
       </div>
 
       <div class="auth-switch" role="tablist" aria-label="Autentisering">
         <button id="show-login-btn" class="auth-switch-btn active" type="button" data-auth-view="login">Innlogging</button>
-        <button id="show-signup-btn" class="auth-switch-btn" type="button" data-auth-view="signup">Sign up</button>
+        <button id="show-signup-btn" class="auth-switch-btn" type="button" data-auth-view="signup">Opprett konto</button>
       </div>
 
       <section id="login-section">
-        <h3>Innlogging</h3>
         <form id="login-form" class="stack">
-          <label for="email">E-postadresse</label>
-          <input id="email" name="email" type="email" placeholder="kevin@example.com" required />
-
-          <label for="password">Passord</label>
-          <input id="password" name="password" type="password" placeholder="Skriv inn passord" required />
-
-          <button class="btn primary" type="submit">Send kode</button>
+          <div class="field">
+            <label for="email">E-postadresse</label>
+            <input id="email" name="email" type="email" placeholder="navn@example.com" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="password">Passord</label>
+            <input id="password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button class="btn primary full" type="submit">
+            Send bekreftelseskode
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
         </form>
-
-        <p class="hint">
-          Midlertidig tilgang: <strong>kevin@example.com</strong> (admin) eller <strong>emma@example.com</strong> (gjest). Passord: <strong>1234</strong>
-        </p>
+        <div class="demo-inline" aria-label="Midlertidig tilgang">
+          <p>
+            Midlertidig tilgang:
+            <button class="demo-link" id="fill-demo-btn" type="button"><span class="demo-email-admin"></span></button>
+            <span class="demo-role">(admin)</span>
+            eller
+            <button class="demo-link" id="fill-demo-guest-btn" type="button"><span class="demo-email-guest"></span></button>
+            <span class="demo-role">(gjest)</span>.
+            Passord:
+            <strong class="demo-password">1234</strong>
+          </p>
+        </div>
       </section>
 
       <section id="signup-section" class="hidden">
-        <h3>Opprett konto</h3>
         <form id="signup-form" class="stack">
-          <label for="signup-name">Navn</label>
-          <input id="signup-name" name="signup-name" type="text" placeholder="Skriv inn navn" required />
-
-          <label for="signup-email">E-postadresse</label>
-          <input id="signup-email" name="signup-email" type="email" placeholder="navn@example.com" required />
-
-          <label for="signup-password">Passord</label>
-          <input id="signup-password" name="signup-password" type="password" placeholder="Lag et passord" required />
-
-          <label for="signup-confirm-password">Bekreft passord</label>
-          <input id="signup-confirm-password" name="signup-confirm-password" type="password" placeholder="Skriv passordet igjen" required />
-
-          <button class="btn primary" type="submit">Opprett konto</button>
+          <div class="field">
+            <label for="signup-name">Fullt navn</label>
+            <input id="signup-name" name="signup-name" type="text" placeholder="Ola Nordmann" required />
+          </div>
+          <div class="field">
+            <label for="signup-email">E-postadresse</label>
+            <input id="signup-email" name="signup-email" type="email" placeholder="navn@example.com" required />
+          </div>
+          <div class="field">
+            <label for="signup-password">Passord</label>
+            <input id="signup-password" name="signup-password" type="password" placeholder="Minst 4 tegn" required />
+          </div>
+          <div class="field">
+            <label for="signup-confirm-password">Bekreft passord</label>
+            <input id="signup-confirm-password" name="signup-confirm-password" type="password" placeholder="Gjenta passord" required />
+          </div>
+          <button class="btn primary full" type="submit">
+            Opprett konto
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
         </form>
       </section>
 
       <section id="otp-section" class="hidden">
-        <h3>Bekreftelseskode</h3>
-        <p class="hint" id="otp-hint">Skriv inn 6-sifret kode fra e-post.</p>
-
+        <div class="otp-header">
+          <div class="otp-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <div>
+            <h3>Bekreftelseskode</h3>
+            <p class="hint" id="otp-hint">Skriv inn 6-sifret kode fra e-post.</p>
+          </div>
+        </div>
         <form id="otp-form" class="stack">
-          <label for="otp">Kode</label>
-          <input id="otp" name="otp" type="text" inputmode="numeric" maxlength="6" placeholder="000000" required />
-
+          <div class="field">
+            <label for="otp">6-sifret kode</label>
+            <input id="otp" name="otp" type="text" inputmode="numeric" maxlength="6" placeholder="000000" required class="otp-input" />
+          </div>
           <div class="button-row">
-            <button class="btn primary" type="submit">Logg inn</button>
-            <button id="back-btn" class="btn secondary" type="button">Tilbake</button>
+            <button class="btn primary" type="submit">Bekreft og logg inn</button>
+            <button id="back-btn" class="btn ghost" type="button">Tilbake</button>
           </div>
         </form>
       </section>
@@ -96,59 +144,102 @@
 
     <section id="app-panel" class="panel app-panel hidden">
       <nav class="tab-nav" aria-label="Hovedmeny">
-        <button class="tab-btn active" data-view="dashboard" type="button">Dashboard</button>
-        <button class="tab-btn" data-view="log" type="button">Logg</button>
-        <button class="tab-btn" data-view="users" type="button">Brukere</button>
-        <button class="tab-btn" data-view="admin" type="button">Admin</button>
+        <button class="tab-btn active" data-view="dashboard" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </button>
+        <button class="tab-btn" data-view="log" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Hendelseslogg
+        </button>
+        <button class="tab-btn" data-view="users" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Brukere
+        </button>
+        <button class="tab-btn" data-view="admin" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Admin
+        </button>
       </nav>
 
       <section id="view-dashboard" class="view active">
         <div class="grid cards">
           <article class="kpi">
-            <p>Alarmstatus</p>
-            <h3 id="alarm-status-text">-</h3>
-            <small id="alarm-status-meta">Sist endret: -</small>
+            <div class="kpi-header">
+              <p class="kpi-label">Alarmstatus</p>
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+            </div>
+            <h3 id="alarm-status-text" class="kpi-value">—</h3>
+            <small id="alarm-status-meta" class="kpi-meta">Sist endret: —</small>
           </article>
           <article class="kpi">
-            <p>Sist opplåst</p>
-            <h3 id="last-unlock-time">-</h3>
-            <small id="last-unlock-user">Bruker: -</small>
+            <div class="kpi-header">
+              <p class="kpi-label">Sist opplåst</p>
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              </div>
+            </div>
+            <h3 id="last-unlock-time" class="kpi-value">—</h3>
+            <small id="last-unlock-user" class="kpi-meta">Bruker: —</small>
           </article>
           <article class="kpi">
-            <p>Sist deaktivert</p>
-            <h3 id="last-deactivate-time">-</h3>
-            <small id="last-deactivate-user">Bruker: -</small>
+            <div class="kpi-header">
+              <p class="kpi-label">Sist deaktivert</p>
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              </div>
+            </div>
+            <h3 id="last-deactivate-time" class="kpi-value">—</h3>
+            <small id="last-deactivate-user" class="kpi-meta">Bruker: —</small>
           </article>
           <article class="kpi">
-            <p>Hendelser (24t)</p>
-            <h3 id="events-last-day">0</h3>
-            <small>Opplåsinger og alarmhendelser</small>
+            <div class="kpi-header">
+              <p class="kpi-label">Hendelser (24t)</p>
+              <div class="kpi-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+            </div>
+            <h3 id="events-last-day" class="kpi-value">0</h3>
+            <small class="kpi-meta">Opplåsinger og alarmhendelser</small>
           </article>
         </div>
 
         <div class="grid split">
           <article class="block">
-            <h3>Registrer hendelse</h3>
+            <div class="block-header">
+              <h3>Registrer hendelse</h3>
+              <span class="block-badge">Simulator</span>
+            </div>
             <form id="simulate-event-form" class="stack compact">
-              <label for="sim-card-id">Kort-ID</label>
-              <input id="sim-card-id" type="text" placeholder="7A3B21" required />
-
-              <label for="sim-action">Handling</label>
-              <select id="sim-action" required>
-                <option value="unlock_door">Låste opp dør</option>
-                <option value="deactivate_alarm">Deaktiverte alarm</option>
-                <option value="activate_alarm">Aktiverte alarm</option>
-              </select>
-
-              <label for="sim-room">Rom / sensor</label>
-              <input id="sim-room" type="text" placeholder="Inngang A" required />
-
-              <button class="btn ghost" type="submit">Legg til hendelse</button>
+              <div class="field">
+                <label for="sim-card-id">Kort-ID</label>
+                <input id="sim-card-id" type="text" placeholder="7A3B21" required />
+              </div>
+              <div class="field">
+                <label for="sim-action">Handling</label>
+                <select id="sim-action" required>
+                  <option value="unlock_door">Låste opp dør</option>
+                  <option value="deactivate_alarm">Deaktiverte alarmen</option>
+                  <option value="activate_alarm">Aktiverte alarmen</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="sim-room">Rom / sensor</label>
+                <input id="sim-room" type="text" placeholder="Inngang A" required />
+              </div>
+              <button class="btn primary" type="submit">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Legg til hendelse
+              </button>
             </form>
           </article>
-
           <article class="block">
-            <h3>Siste hendelser</h3>
+            <div class="block-header">
+              <h3>Siste hendelser</h3>
+              <span class="block-badge live">● Live</span>
+            </div>
             <ul id="recent-open-list" class="recent-list"></ul>
           </article>
         </div>
@@ -156,24 +247,19 @@
 
       <section id="view-log" class="view">
         <div class="toolbar">
-          <input id="log-search" type="search" placeholder="Søk navn eller handling" />
+          <div class="search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" class="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="log-search" type="search" placeholder="Søk navn eller handling…" />
+          </div>
           <select id="time-filter">
             <option value="24h">Siste 24 timer</option>
             <option value="week">Siste uke</option>
             <option value="all">Alle hendelser</option>
           </select>
         </div>
-
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Navn</th>
-                <th>Handling</th>
-                <th>Dato</th>
-                <th>Tid</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Navn</th><th>Handling</th><th>Dato</th><th>Tid</th></tr></thead>
             <tbody id="log-table-body"></tbody>
           </table>
         </div>
@@ -182,14 +268,7 @@
       <section id="view-users" class="view">
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Navn</th>
-                <th>Kort-ID</th>
-                <th>Rolle</th>
-                <th>E-post</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Navn</th><th>Kort-ID</th><th>Rolle</th><th>E-post</th></tr></thead>
             <tbody id="users-table-body"></tbody>
           </table>
         </div>
@@ -197,48 +276,49 @@
 
       <section id="view-admin" class="view">
         <div id="admin-locked" class="access-note hidden">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Denne siden er kun tilgjengelig for admin.
         </div>
-
         <div id="admin-content">
-          <article class="block">
-            <h3>Legg til nytt kort</h3>
-            <form id="add-user-form" class="stack compact">
-              <label for="new-name">Navn</label>
-              <input id="new-name" type="text" placeholder="Nora" required />
-
-              <label for="new-card-id">Kort-ID</label>
-              <input id="new-card-id" type="text" placeholder="AB12CD" required />
-
-              <label for="new-role">Rolle</label>
-              <select id="new-role">
-                <option value="gjest">gjest</option>
-                <option value="admin">admin</option>
-              </select>
-
-              <label for="new-email">E-post</label>
-              <input id="new-email" type="email" placeholder="nora@example.com" required />
-
-              <button class="btn primary" type="submit">Legg til bruker</button>
-            </form>
-          </article>
-
-          <article class="block">
-            <h3>Administrer kort og navn</h3>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Navn</th>
-                    <th>Kort-ID</th>
-                    <th>Rolle</th>
-                    <th>Handling</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-users-body"></tbody>
-              </table>
-            </div>
-          </article>
+          <div class="admin-grid">
+            <article class="block">
+              <div class="block-header"><h3>Legg til nytt kort</h3></div>
+              <form id="add-user-form" class="stack compact">
+                <div class="field">
+                  <label for="new-name">Navn</label>
+                  <input id="new-name" type="text" placeholder="Nora Nordmann" required />
+                </div>
+                <div class="field">
+                  <label for="new-card-id">Kort-ID</label>
+                  <input id="new-card-id" type="text" placeholder="AB12CD" required />
+                </div>
+                <div class="field">
+                  <label for="new-role">Rolle</label>
+                  <select id="new-role">
+                    <option value="gjest">Gjest</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="new-email">E-post</label>
+                  <input id="new-email" type="email" placeholder="nora@example.com" required />
+                </div>
+                <button class="btn primary" type="submit">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Legg til bruker
+                </button>
+              </form>
+            </article>
+            <article class="block">
+              <div class="block-header"><h3>Administrer brukere</h3></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Navn</th><th>Kort-ID</th><th>Rolle</th><th>Handling</th></tr></thead>
+                  <tbody id="admin-users-body"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -247,9 +327,36 @@
   </main>
 
   <aside id="welcome-popup" class="welcome-popup hidden" role="status" aria-live="polite">
-    <p id="welcome-popup-text">Hallo bruker</p>
-    <button id="welcome-popup-close" class="popup-close" type="button" aria-label="Lukk popup">Lukk</button>
+    <div class="popup-inner">
+      <div class="popup-dot" aria-hidden="true"></div>
+      <p id="welcome-popup-text">Hallo bruker</p>
+    </div>
+    <button id="welcome-popup-close" class="popup-close" type="button" aria-label="Lukk popup">✕</button>
   </aside>
+
+  <!-- =============================================
+       DEMO BAR — fjern denne blokken når du er ferdig
+       ============================================= -->
+  <div id="legacy-demo-bar" class="demo-bar">
+    <div class="demo-bar-inner">
+      <span class="demo-bar-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Demo
+      </span>
+      <div class="demo-bar-accounts">
+        <button class="demo-account-btn" id="legacy-fill-demo-btn" type="button">
+          <span class="demo-email-admin"></span>
+          <span class="badge-admin">admin</span>
+        </button>
+        <button class="demo-account-btn" id="legacy-fill-demo-guest-btn" type="button">
+          <span class="demo-email-guest"></span>
+          <span class="badge-guest">gjest</span>
+        </button>
+      </div>
+      <span class="demo-bar-pass">Passord: <span class="mono">1234</span></span>
+      <button class="demo-bar-close" id="demo-bar-close" type="button" aria-label="Lukk">✕</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

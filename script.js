@@ -84,8 +84,8 @@ const FILTER_WINDOWS = {
 
 const ACTION_LABELS = {
   unlock_door: "Låste opp dør",
-  deactivate_alarm: "Deaktiverte alarm",
-  activate_alarm: "Aktiverte alarm"
+  deactivate_alarm: "Deaktiverte alarmen",
+  activate_alarm: "Aktiverte alarmen"
 };
 
 const DATE_FORMATTER = new Intl.DateTimeFormat("nb-NO", {
@@ -101,7 +101,7 @@ const TIME_FORMATTER = new Intl.DateTimeFormat("nb-NO", {
 
 const INITIAL_ACCOUNTS = [
   { email: "kevin@example.com", password: "1234", otp: "123456", name: "Kevin", role: "admin", cardId: "7A3B21" },
-  { email: "emma@example.com", password: "1234", otp: "654321", name: "Emma", role: "gjest", cardId: "9F8C11" },
+  { email: "fredrik@example.com", password: "1234", otp: "654321", name: "Fredrik", role: "gjest", cardId: "9F8C11" },
   { email: "ola@example.com", password: "1234", otp: "111111", name: "Ola", role: "gjest", cardId: "AB19F2" },
   { email: "jonas@example.com", password: "1234", otp: "222222", name: "Jonas", role: "gjest", cardId: "4DA221" }
 ];
@@ -111,10 +111,10 @@ const state = {
   users: INITIAL_ACCOUNTS.map(mapAccountToUser),
   events: [
     createEvent("Ola", "AB19F2", "deactivate_alarm", "Gang B", hoursAgo(1.5)),
-    createEvent("Emma", "9F8C11", "unlock_door", "Inngang A", hoursAgo(0.7)),
+    createEvent("Fredrik", "9F8C11", "unlock_door", "Inngang A", hoursAgo(0.7)),
     createEvent("Jonas", "4DA221", "activate_alarm", "Lab 2", hoursAgo(4)),
     createEvent("Kevin", "7A3B21", "unlock_door", "Resepsjon", hoursAgo(18)),
-    createEvent("Emma", "9F8C11", "unlock_door", "Inngang A", hoursAgo(27))
+    createEvent("Fredrik", "9F8C11", "unlock_door", "Inngang A", hoursAgo(27))
   ],
   alarmActive: false,
   currentUser: null,
@@ -348,7 +348,7 @@ function renderDashboard() {
           const action = escapeHtml(getActionLabel(entry.action));
           const time = escapeHtml(formatTime(entry.timestamp));
           const date = escapeHtml(formatDate(entry.timestamp));
-          return `<li><strong>${name}</strong> - ${action} ${time} (${date})</li>`;
+          return `<li><strong>${name}</strong> — ${action} <span style="opacity:0.6;font-size:0.8em;font-family:var(--font-mono)">${time} · ${date}</span></li>`;
         })
         .join("")
     : "<li>Ingen hendelser registrert.</li>";
@@ -358,7 +358,7 @@ function renderLog() {
   const rows = getFilteredEvents();
 
   if (!rows.length) {
-    DOM.log.tableBody.innerHTML = '<tr><td colspan="4">Ingen hendelser funnet.</td></tr>';
+    DOM.log.tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Ingen hendelser funnet.</td></tr>';
     return;
   }
 
@@ -374,7 +374,7 @@ function renderLog() {
           <td>${name}</td>
           <td>${action}</td>
           <td>${date}</td>
-          <td>${time}</td>
+          <td style="font-family:var(--font-mono);font-size:0.82rem">${time}</td>
         </tr>
       `;
     })
@@ -394,7 +394,7 @@ function renderUsers() {
           <td>${name}</td>
           <td><code>${cardId}</code></td>
           <td>${roleBadge}</td>
-          <td>${email}</td>
+          <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--muted)">${email}</td>
         </tr>
       `;
     })
@@ -750,6 +750,57 @@ function handleAdminTableClick(event) {
   showMessage(DOM.appMessage, `Oppdatert ${newName}.`, "success");
 }
 
+function initTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "light") {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+}
+
+function initDemoHint() {
+  const adminEmail = ["kevin", "@", "example.com"].join("");
+  const guestEmail = ["fredrik", "@", "example.com"].join("");
+
+  // Fill email spans via JS so Cloudflare doesn't scramble them
+  document.querySelectorAll(".demo-email-admin").forEach(el => { el.textContent = adminEmail; });
+  document.querySelectorAll(".demo-email-guest").forEach(el => { el.textContent = guestEmail; });
+
+  // Admin fill button
+  const fillAdminBtn = document.getElementById("fill-demo-btn");
+  if (fillAdminBtn) {
+    fillAdminBtn.addEventListener("click", () => {
+      setAuthView("login");
+      DOM.emailInput.value = adminEmail;
+      DOM.passwordInput.value = "1234";
+      DOM.passwordInput.focus();
+    });
+  }
+
+  // Guest fill button
+  const fillGuestBtn = document.getElementById("fill-demo-guest-btn");
+  if (fillGuestBtn) {
+    fillGuestBtn.addEventListener("click", () => {
+      setAuthView("login");
+      DOM.emailInput.value = guestEmail;
+      DOM.passwordInput.value = "1234";
+      DOM.passwordInput.focus();
+    });
+  }
+
+  // Close button — hides the bar
+}
+
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  if (isLight) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.documentElement.setAttribute("data-theme", "light");
+    localStorage.setItem("theme", "light");
+  }
+}
+
 function bindEvents() {
   DOM.authSwitchButtons.forEach((button) => {
     button.addEventListener("click", handleAuthSwitch);
@@ -761,6 +812,9 @@ function bindEvents() {
   DOM.backBtn.addEventListener("click", handleBackFromOtp);
   DOM.logoutBtn.addEventListener("click", handleLogout);
   DOM.popupCloseBtn.addEventListener("click", hideWelcomePopup);
+
+  const themeBtn = document.getElementById("theme-toggle-btn");
+  if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
 
   DOM.tabs.forEach((tab) => {
     tab.addEventListener("click", handleTabClick);
@@ -775,6 +829,8 @@ function bindEvents() {
 }
 
 function init() {
+  initTheme();
+  initDemoHint();
   bindEvents();
   showAuth();
 }
