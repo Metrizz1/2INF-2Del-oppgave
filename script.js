@@ -248,7 +248,6 @@ function findUserByCardId(cardId) {
 
 function findUserAndAccountIndexes(cardId) {
   const targetCardId = normalizeCardId(cardId);
-
   return {
     userIndex: state.users.findIndex((user) => normalizeCardId(user.cardId) === targetCardId),
     accountIndex: state.accounts.findIndex((account) => normalizeCardId(account.cardId) === targetCardId)
