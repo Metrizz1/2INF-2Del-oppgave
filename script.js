@@ -100,21 +100,24 @@ const TIME_FORMATTER = new Intl.DateTimeFormat("nb-NO", {
 });
 
 const INITIAL_ACCOUNTS = [
-  { email: "kevin@example.com", password: "1234", otp: "123456", name: "Kevin", role: "admin", cardId: "7A3B21" },
-  { email: "fredrik@example.com", password: "1234", otp: "654321", name: "Fredrik", role: "gjest", cardId: "9F8C11" },
-  { email: "ola@example.com", password: "1234", otp: "111111", name: "Ola", role: "gjest", cardId: "AB19F2" },
-  { email: "jonas@example.com", password: "1234", otp: "222222", name: "Jonas", role: "gjest", cardId: "4DA221" }
+  { email: "admin@example.com", password: "1234", otp: "123456", name: "admin", role: "admin", cardId: "7A3B21" },
+  { email: "kevin@example.com", password: "1234", otp: "654321", name: "Kevin", role: "gjest", cardId: "9F8C11" },
+  { email: "dawid@example.com", password: "1234", otp: "111111", name: "Dawid", role: "gjest", cardId: "AB19F2" },
+  { email: "philip@example.com", password: "1234", otp: "222222", name: "Philip", role: "gjest", cardId: "4DA221" },
+  { email: "andreas@example.com", password: "1234", otp: "333333", name: "andreas", role: "gjest", cardId: "6BC452" },
+  { email: "ludvig@example.com", password: "1234", otp: "444444", name: "ludvig", role: "gjest", cardId: "2ED783" },
+  { email: "bedrihan@example.com", password: "1234", otp: "555555", name: "bedrihan", role: "gjest", cardId: "5FA904" }
 ];
 
 const state = {
   accounts: INITIAL_ACCOUNTS.map((account) => ({ ...account })),
   users: INITIAL_ACCOUNTS.map(mapAccountToUser),
   events: [
-    createEvent("Ola", "AB19F2", "deactivate_alarm", "Gang B", hoursAgo(1.5)),
-    createEvent("Fredrik", "9F8C11", "unlock_door", "Inngang A", hoursAgo(0.7)),
-    createEvent("Jonas", "4DA221", "activate_alarm", "Lab 2", hoursAgo(4)),
-    createEvent("Kevin", "7A3B21", "unlock_door", "Resepsjon", hoursAgo(18)),
-    createEvent("Fredrik", "9F8C11", "unlock_door", "Inngang A", hoursAgo(27))
+    createEvent("Dawid", "AB19F2", "deactivate_alarm", "Gang B", hoursAgo(1.5)),
+    createEvent("Kevin", "9F8C11", "unlock_door", "Inngang A", hoursAgo(0.7)),
+    createEvent("Philip", "4DA221", "activate_alarm", "Lab 2", hoursAgo(4)),
+    createEvent("admin", "7A3B21", "unlock_door", "Resepsjon", hoursAgo(18)),
+    createEvent("ludvig", "2ED783", "unlock_door", "Inngang A", hoursAgo(27))
   ],
   alarmActive: false,
   currentUser: null,
@@ -260,6 +263,10 @@ function findLatestEventByAction(action) {
 
 function findLatestAlarmChange() {
   return state.events.find((entry) => entry.action === "activate_alarm" || entry.action === "deactivate_alarm") || null;
+}
+
+function getAdminCount() {
+  return state.users.filter((user) => user.role === "admin").length;
 }
 
 function addEvent(eventInput) {
@@ -709,6 +716,12 @@ function handleAdminTableClick(event) {
 
   if (action === "remove") {
     const removedUser = state.users[userIndex];
+
+    if (removedUser.role === "admin" && getAdminCount() === 1) {
+      showMessage(DOM.appMessage, "Du kan ikke slette den siste admin-brukeren.", "error");
+      return;
+    }
+
     state.users.splice(userIndex, 1);
     state.accounts.splice(accountIndex, 1);
 
@@ -735,6 +748,16 @@ function handleAdminTableClick(event) {
   const newName = nameInput.value.trim();
   const newRole = roleInput.value;
 
+  if (!newName) {
+    showMessage(DOM.appMessage, "Navn kan ikke være tomt.", "error");
+    return;
+  }
+
+  if (state.users[userIndex].role === "admin" && newRole !== "admin" && getAdminCount() === 1) {
+    showMessage(DOM.appMessage, "Du kan ikke fjerne admin fra den siste admin-brukeren.", "error");
+    return;
+  }
+
   state.users[userIndex].name = newName;
   state.users[userIndex].role = newRole;
   state.accounts[accountIndex].name = newName;
@@ -757,8 +780,8 @@ function initTheme() {
 }
 
 function initDemoHint() {
-  const adminEmail = ["kevin", "@", "example.com"].join("");
-  const guestEmail = ["fredrik", "@", "example.com"].join("");
+  const adminEmail = ["admin", "@", "example.com"].join("");
+  const guestEmail = ["kevin", "@", "example.com"].join("");
 
   // Fill email spans via JS so Cloudflare doesn't scramble them
   document.querySelectorAll(".demo-email-admin").forEach(el => { el.textContent = adminEmail; });
