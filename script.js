@@ -1,178 +1,279 @@
-﻿const DOM = {
-  authPanel: document.getElementById("auth-panel"),
-  appPanel: document.getElementById("app-panel"),
-  topbar: document.getElementById("app-topbar"),
+const DOM = {
+  loginPage: document.getElementById("login-page"),
+  app: document.getElementById("app"),
+  authTabs: Array.from(document.querySelectorAll("[data-auth-tab]")),
+  authError: document.getElementById("auth-error"),
+  infoBox: document.getElementById("info-box"),
+  loginPanel: document.getElementById("login-panel"),
+  registerPanel: document.getElementById("register-panel"),
+  otpPanel: document.getElementById("otp-panel"),
+  otpDescription: document.getElementById("otp-description"),
 
-  authSwitchButtons: Array.from(document.querySelectorAll(".auth-switch-btn")),
-  loginSection: document.getElementById("login-section"),
-  signUpSection: document.getElementById("signup-section"),
-  otpSection: document.getElementById("otp-section"),
   loginForm: document.getElementById("login-form"),
-  signUpForm: document.getElementById("signup-form"),
+  loginEmail: document.getElementById("login-email"),
+  loginPassword: document.getElementById("login-password"),
+  loginSendCode: document.getElementById("login-send-code"),
+  forgotBtn: document.getElementById("forgot-btn"),
+
+  registerForm: document.getElementById("register-form"),
+  regName: document.getElementById("reg-name"),
+  regEmail: document.getElementById("reg-email"),
+  regPassword: document.getElementById("reg-password"),
+  regCardId: document.getElementById("reg-kortid"),
+
   otpForm: document.getElementById("otp-form"),
-  backBtn: document.getElementById("back-btn"),
-  otpHint: document.getElementById("otp-hint"),
+  otpCode: document.getElementById("otp-code"),
+  otpBack: document.getElementById("otp-back"),
 
-  emailInput: document.getElementById("email"),
-  passwordInput: document.getElementById("password"),
-  signUpNameInput: document.getElementById("signup-name"),
-  signUpEmailInput: document.getElementById("signup-email"),
-  signUpPasswordInput: document.getElementById("signup-password"),
-  signUpConfirmPasswordInput: document.getElementById("signup-confirm-password"),
-  otpInput: document.getElementById("otp"),
-
-  authMessage: document.getElementById("auth-message"),
-  appMessage: document.getElementById("app-message"),
-  welcomeText: document.getElementById("welcome-text"),
-  rolePill: document.getElementById("role-pill"),
+  topbarName: document.getElementById("topbar-name"),
+  topbarRole: document.getElementById("topbar-role"),
+  themeToggle: document.getElementById("theme-toggle"),
   logoutBtn: document.getElementById("logout-btn"),
+  adminNavBtn: document.getElementById("admin-nav-btn"),
+  navItems: Array.from(document.querySelectorAll(".nav-item")),
 
-  popup: document.getElementById("welcome-popup"),
-  popupText: document.getElementById("welcome-popup-text"),
-  popupCloseBtn: document.getElementById("welcome-popup-close"),
+  dashboardPage: document.getElementById("page-dashboard"),
+  logPage: document.getElementById("page-log"),
+  usersPage: document.getElementById("page-users"),
+  adminPage: document.getElementById("page-admin"),
 
-  tabs: Array.from(document.querySelectorAll(".tab-btn")),
-  views: Array.from(document.querySelectorAll(".view")),
+  alarmStatus: document.getElementById("alarm-status"),
+  alarmSub: document.getElementById("alarm-sub"),
+  lastUnlock: document.getElementById("last-unlock"),
+  lastUnlockSub: document.getElementById("last-unlock-sub"),
+  lastDeact: document.getElementById("last-deact"),
+  lastDeactSub: document.getElementById("last-deact-sub"),
+  eventCount: document.getElementById("event-count"),
+  eventsFeed: document.getElementById("events-feed"),
 
-  dashboard: {
-    alarmStatusText: document.getElementById("alarm-status-text"),
-    alarmStatusMeta: document.getElementById("alarm-status-meta"),
-    lastUnlockTime: document.getElementById("last-unlock-time"),
-    lastUnlockUser: document.getElementById("last-unlock-user"),
-    lastDeactivateTime: document.getElementById("last-deactivate-time"),
-    lastDeactivateUser: document.getElementById("last-deactivate-user"),
-    eventsLastDay: document.getElementById("events-last-day"),
-    recentOpenList: document.getElementById("recent-open-list")
+  simForm: document.getElementById("sim-form"),
+  simCardId: document.getElementById("sim-kortid"),
+  simAction: document.getElementById("sim-action"),
+  simRoom: document.getElementById("sim-room"),
+  simClear: document.getElementById("sim-clear"),
+
+  logSearch: document.getElementById("log-search"),
+  logTypeFilter: document.getElementById("log-type-filter"),
+  logTimeFilter: document.getElementById("log-time-filter"),
+  exportBtn: document.getElementById("export-btn"),
+  logBody: document.getElementById("log-body"),
+  logCount: document.getElementById("log-count"),
+  logPrev: document.getElementById("log-prev"),
+  logNext: document.getElementById("log-next"),
+
+  usersSearch: document.getElementById("users-search"),
+  roleTabs: Array.from(document.querySelectorAll("[data-role-filter]")),
+  usersBody: document.getElementById("users-body"),
+  usersCount: document.getElementById("users-count"),
+
+  adminNote: document.getElementById("admin-note"),
+  adminContent: document.getElementById("admin-content"),
+  adminAddForm: document.getElementById("admin-add-form"),
+  addName: document.getElementById("add-name"),
+  addCardId: document.getElementById("add-kortid"),
+  addRole: document.getElementById("add-role"),
+  addEmail: document.getElementById("add-email"),
+  autoCardId: document.getElementById("auto-kortid"),
+  clearEventsBtn: document.getElementById("clear-events-btn"),
+  adminBody: document.getElementById("admin-body"),
+  saveRolesBtn: document.getElementById("save-roles-btn"),
+  adminSaveRow: document.getElementById("admin-save-row"),
+
+  toastContainer: document.getElementById("toast-container")
+};
+
+const TOKEN_KEY = "sa_token";
+const PAGE_IDS = ["dashboard", "log", "users", "admin"];
+const ACTION_META = {
+  unlock_door: { label: "Låste opp dør", badgeClass: "unlock", badgeText: "opplåst" },
+  lock_door: { label: "Låste dør", badgeClass: "alarm", badgeText: "låst" },
+  activate_alarm: { label: "Alarm aktivert", badgeClass: "alarm", badgeText: "alarm på" },
+  deactivate_alarm: { label: "Alarm deaktivert", badgeClass: "alarm", badgeText: "alarm av" },
+  deny_access: { label: "Tilgang nektet", badgeClass: "deny", badgeText: "avvist" }
+};
+
+const state = {
+  currentUser: null,
+  users: [],
+  events: [],
+  pendingEmail: "",
+  activePage: "dashboard",
+  roleFilter: "",
+  logPage: 0,
+  logPageSize: 10
+};
+
+const storage = {
+  getToken() {
+    return localStorage.getItem(TOKEN_KEY);
   },
-
-  log: {
-    searchInput: document.getElementById("log-search"),
-    timeFilter: document.getElementById("time-filter"),
-    tableBody: document.getElementById("log-table-body")
+  setToken(token) {
+    localStorage.setItem(TOKEN_KEY, token);
   },
-
-  users: {
-    tableBody: document.getElementById("users-table-body")
-  },
-
-  admin: {
-    lockedNote: document.getElementById("admin-locked"),
-    content: document.getElementById("admin-content"),
-    addUserForm: document.getElementById("add-user-form"),
-    tableBody: document.getElementById("admin-users-body"),
-    newNameInput: document.getElementById("new-name"),
-    newCardIdInput: document.getElementById("new-card-id"),
-    newRoleInput: document.getElementById("new-role"),
-    newEmailInput: document.getElementById("new-email")
-  },
-
-  simulator: {
-    form: document.getElementById("simulate-event-form"),
-    cardIdInput: document.getElementById("sim-card-id"),
-    actionInput: document.getElementById("sim-action"),
-    roomInput: document.getElementById("sim-room")
+  clearToken() {
+    localStorage.removeItem(TOKEN_KEY);
   }
 };
 
-const POPUP_TIMEOUT_MS = 2600;
-const HOURS_24_MS = 24 * 60 * 60 * 1000;
-const FILTER_WINDOWS = {
-  "24h": HOURS_24_MS,
-  week: 7 * HOURS_24_MS,
-  all: Number.POSITIVE_INFINITY
+const api = {
+  async request(path, options = {}) {
+    const headers = new Headers(options.headers || {});
+
+    if (options.body && !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+
+    const token = storage.getToken();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    let response;
+
+    try {
+      response = await fetch(`/api${path}`, {
+        method: options.method || "GET",
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined
+      });
+    } catch (error) {
+      throw new Error("Fikk ikke kontakt med serveren. Åpne siden via http://localhost:3000.");
+    }
+
+    let payload = null;
+    try {
+      payload = await response.json();
+    } catch (error) {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      if (payload?.error) {
+        throw new Error(payload.error);
+      }
+
+      if (response.status === 404) {
+        throw new Error("Fant ikke tjenesten. Åpne siden via http://localhost:3000.");
+      }
+
+      throw new Error(`Serverfeil (${response.status}).`);
+    }
+
+    return payload;
+  },
+  login(email, password) {
+    return this.request("/auth/login", {
+      method: "POST",
+      body: { email, password }
+    });
+  },
+  signup(payload) {
+    return this.request("/auth/signup", {
+      method: "POST",
+      body: payload
+    });
+  },
+  verifyOtp(email, otp) {
+    return this.request("/auth/verify-otp", {
+      method: "POST",
+      body: { email, otp }
+    });
+  },
+  logout() {
+    return this.request("/auth/logout", { method: "POST" });
+  },
+  bootstrap() {
+    return this.request("/bootstrap");
+  },
+  me() {
+    return this.request("/auth/me");
+  },
+  createEvent(payload) {
+    return this.request("/events", {
+      method: "POST",
+      body: payload
+    });
+  },
+  addUser(payload) {
+    return this.request("/admin/users", {
+      method: "POST",
+      body: payload
+    });
+  },
+  updateUser(cardId, payload) {
+    return this.request(`/admin/users/${encodeURIComponent(cardId)}`, {
+      method: "PATCH",
+      body: payload
+    });
+  },
+  deleteUser(cardId) {
+    return this.request(`/admin/users/${encodeURIComponent(cardId)}`, {
+      method: "DELETE"
+    });
+  },
+  clearEvents() {
+    return this.request("/admin/events", {
+      method: "DELETE"
+    });
+  }
 };
 
-const ACTION_LABELS = {
-  unlock_door: "Låste opp dør",
-  deactivate_alarm: "Deaktiverte alarmen",
-  activate_alarm: "Aktiverte alarmen"
-};
-
-const DATE_FORMATTER = new Intl.DateTimeFormat("nb-NO", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric"
-});
-
-const TIME_FORMATTER = new Intl.DateTimeFormat("nb-NO", {
-  hour: "2-digit",
-  minute: "2-digit"
-});
-
-const INITIAL_ACCOUNTS = [
-  { email: "admin@example.com", password: "1234", otp: "123456", name: "admin", role: "admin", cardId: "7A3B21" },
-  { email: "kevin@example.com", password: "1234", otp: "654321", name: "Kevin", role: "gjest", cardId: "9F8C11" },
-  { email: "dawid@example.com", password: "1234", otp: "111111", name: "Dawid", role: "gjest", cardId: "AB19F2" },
-  { email: "philip@example.com", password: "1234", otp: "222222", name: "Philip", role: "gjest", cardId: "4DA221" },
-  { email: "andreas@example.com", password: "1234", otp: "333333", name: "andreas", role: "gjest", cardId: "6BC452" },
-  { email: "ludvig@example.com", password: "1234", otp: "444444", name: "ludvig", role: "gjest", cardId: "2ED783" },
-  { email: "bedrihan@example.com", password: "1234", otp: "555555", name: "bedrihan", role: "gjest", cardId: "5FA904" }
-];
-
-const state = {
-  accounts: INITIAL_ACCOUNTS.map((account) => ({ ...account })),
-  users: INITIAL_ACCOUNTS.map(mapAccountToUser),
-  events: [
-    createEvent("Dawid", "AB19F2", "deactivate_alarm", "Gang B", hoursAgo(1.5)),
-    createEvent("Kevin", "9F8C11", "unlock_door", "Inngang A", hoursAgo(0.7)),
-    createEvent("Philip", "4DA221", "activate_alarm", "Lab 2", hoursAgo(4)),
-    createEvent("admin", "7A3B21", "unlock_door", "Resepsjon", hoursAgo(18)),
-    createEvent("ludvig", "2ED783", "unlock_door", "Inngang A", hoursAgo(27))
-  ],
-  alarmActive: false,
-  currentUser: null,
-  pendingAccount: null,
-  activeView: "dashboard",
-  activeAuthView: "login",
-  popupTimer: null
-};
-
-state.alarmActive = inferAlarmStateFromEvents(state.events);
-
-function mapAccountToUser({ name, cardId, role, email }) {
-  return { name, cardId, role, email };
+function normalizeRole(role) {
+  if (role === "owner") return "owner";
+  if (role === "admin") return "admin";
+  return "gjest";
 }
 
-function hoursAgo(hours) {
-  return new Date(Date.now() - hours * 60 * 60 * 1000);
+function roleLabel(role) {
+  const safeRole = normalizeRole(role);
+  if (safeRole === "owner") return "Eier";
+  if (safeRole === "admin") return "Admin";
+  return "Gjest";
 }
 
-function createEvent(name, cardId, action, room, timestamp = new Date()) {
+function roleBadgeLabel(role) {
+  return roleLabel(role).toUpperCase();
+}
+
+function normalizeAction(action) {
+  if (ACTION_META[action]) {
+    return action;
+  }
+
+  const lower = String(action || "").trim().toLowerCase();
+
+  if (lower === "låste opp dør" || lower === "laste opp dor") return "unlock_door";
+  if (lower === "låste dør" || lower === "laste dor") return "lock_door";
+  if (lower === "alarm aktivert") return "activate_alarm";
+  if (lower === "alarm deaktivert") return "deactivate_alarm";
+  if (lower === "tilgang nektet") return "deny_access";
+
+  return "unlock_door";
+}
+
+function normalizeUser(user) {
   return {
-    name,
-    cardId,
-    action,
-    room,
-    timestamp: timestamp instanceof Date ? timestamp : new Date(timestamp)
+    id: user.id,
+    name: user.name,
+    email: user.email || "",
+    role: normalizeRole(user.role),
+    cardId: user.cardId || user.kortid || ""
   };
 }
 
-function inferAlarmStateFromEvents(events) {
-  const latestAlarmEvent = events.find((entry) => entry.action === "activate_alarm" || entry.action === "deactivate_alarm");
-  if (!latestAlarmEvent) return true;
-  return latestAlarmEvent.action === "activate_alarm";
-}
-
-function normalizeEmail(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function normalizeCardId(value) {
-  return String(value || "").trim().toUpperCase();
-}
-
-function normalizeName(value) {
-  return String(value || "").trim().replace(/\s+/g, " ");
-}
-
-function toTitleCase(value) {
-  const text = String(value || "").trim();
-  if (!text) return "Ukjent";
-  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+function normalizeEvent(event) {
+  return {
+    id: event.id,
+    name: event.name || "Ukjent kort",
+    cardId: event.cardId || event.kortid || "",
+    action: normalizeAction(event.action),
+    room: event.room || "",
+    ts: event.timestamp || event.ts
+  };
 }
 
 function escapeHtml(value) {
-  return String(value)
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -180,681 +281,695 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function renderRoleBadge(role) {
-  const normalizedRole = role === "admin" ? "admin" : "gjest";
-  const roleClass = normalizedRole === "admin" ? "role-admin" : "role-guest";
-  return `<span class="role-badge ${roleClass}">${escapeHtml(normalizedRole)}</span>`;
+function actionLabel(action) {
+  return ACTION_META[normalizeAction(action)].label;
 }
 
-function getActionLabel(action) {
-  return ACTION_LABELS[action] || action;
+function actionBadge(action) {
+  return ACTION_META[normalizeAction(action)];
 }
 
-function formatDate(value) {
-  return DATE_FORMATTER.format(value);
+function joinMeta(parts) {
+  return parts.filter(Boolean).join(" | ");
 }
 
-function formatTime(value) {
-  return TIME_FORMATTER.format(value);
+function fmtTime(ts) {
+  const date = new Date(ts);
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
-function generateUniqueCardId() {
-  let cardId = "";
-
-  do {
-    cardId = Math.random().toString(16).slice(2, 8).toUpperCase();
-  } while (state.users.some((user) => normalizeCardId(user.cardId) === cardId));
-
-  return cardId;
+function fmtDate(ts) {
+  const date = new Date(ts);
+  return `${String(date.getDate()).padStart(2, "0")}.${String(date.getMonth() + 1).padStart(2, "0")}.${date.getFullYear()}`;
 }
 
-function generateOtp() {
-  return String(Math.floor(100000 + Math.random() * 900000));
+function initialsFor(name) {
+  return String(name || "Ukjent")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 }
 
-function showMessage(element, text, type = "info") {
-  element.textContent = text;
-  element.className = "message";
-  element.classList.add(type);
-  element.classList.remove("hidden");
-}
-
-function hideMessage(element) {
-  element.textContent = "";
-  element.className = "message hidden";
-}
-
-function hideWelcomePopup() {
-  if (state.popupTimer) {
-    clearTimeout(state.popupTimer);
-    state.popupTimer = null;
-  }
-
-  DOM.popup.classList.add("hidden");
-}
-
-function showWelcomePopup(name) {
-  hideWelcomePopup();
-  DOM.popupText.textContent = `Hallo ${toTitleCase(name)}`;
-  DOM.popup.classList.remove("hidden");
-  state.popupTimer = window.setTimeout(hideWelcomePopup, POPUP_TIMEOUT_MS);
+function sortedEvents() {
+  return [...state.events].sort((left, right) => new Date(right.ts) - new Date(left.ts));
 }
 
 function isAdmin() {
-  return state.currentUser?.role === "admin";
+  return state.currentUser?.role === "admin" || state.currentUser?.role === "owner";
 }
 
-function findUserByCardId(cardId) {
-  const targetCardId = normalizeCardId(cardId);
-  return state.users.find((user) => normalizeCardId(user.cardId) === targetCardId) || null;
+function setAuthError(message = "") {
+  DOM.authError.textContent = message;
+  DOM.authError.classList.toggle("hidden", !message);
 }
 
-function findUserAndAccountIndexes(cardId) {
-  const targetCardId = normalizeCardId(cardId);
-  return {
-    userIndex: state.users.findIndex((user) => normalizeCardId(user.cardId) === targetCardId),
-    accountIndex: state.accounts.findIndex((account) => normalizeCardId(account.cardId) === targetCardId)
-  };
+function setInfo(message) {
+  DOM.infoBox.innerHTML = message;
 }
 
-function findLatestEventByAction(action) {
-  return state.events.find((entry) => entry.action === action) || null;
+function showAuthTab(tab) {
+  const safeTab = tab === "register" ? "register" : "login";
+
+  DOM.authTabs.forEach((button) => {
+    button.classList.toggle("active", button.dataset.authTab === safeTab);
+  });
+
+  DOM.loginPanel.classList.toggle("hidden", safeTab !== "login");
+  DOM.registerPanel.classList.toggle("hidden", safeTab !== "register");
+  DOM.otpPanel.classList.add("hidden");
+  state.pendingEmail = "";
+  DOM.otpForm.reset();
+  setAuthError("");
 }
 
-function findLatestAlarmChange() {
-  return state.events.find((entry) => entry.action === "activate_alarm" || entry.action === "deactivate_alarm") || null;
+function showOtpPanel(email, otpPreview, contextLabel) {
+  state.pendingEmail = email;
+  DOM.loginPanel.classList.add("hidden");
+  DOM.registerPanel.classList.add("hidden");
+  DOM.otpPanel.classList.remove("hidden");
+  DOM.otpDescription.textContent = `${contextLabel} for ${email}. Bekreftelseskode: ${otpPreview}`;
+  setInfo(`Bruk koden <strong>${escapeHtml(otpPreview)}</strong> for å bekrefte handlingen.`);
 }
 
-function getAdminCount() {
-  return state.users.filter((user) => user.role === "admin").length;
+function showPage(pageName) {
+  const safePage = PAGE_IDS.includes(pageName) ? pageName : "dashboard";
+  state.activePage = safePage;
+
+  PAGE_IDS.forEach((pageId) => {
+    const element = document.getElementById(`page-${pageId}`);
+    element.classList.toggle("hidden", pageId !== safePage);
+  });
+
+  DOM.navItems.forEach((item) => {
+    item.classList.toggle("active", item.dataset.page === safePage);
+  });
+
+  if (safePage === "log") renderLog();
+  if (safePage === "users") renderUsers();
+  if (safePage === "admin") renderAdmin();
 }
 
-function addEvent(eventInput) {
-  const event = createEvent(eventInput.name, eventInput.cardId, eventInput.action, eventInput.room, new Date());
-  state.events.unshift(event);
+function showLoginPage() {
+  DOM.app.classList.remove("active");
+  DOM.loginPage.classList.add("active");
+}
 
-  if (event.action === "activate_alarm") {
-    state.alarmActive = true;
-  }
+function showAppShell() {
+  DOM.loginPage.classList.remove("active");
+  DOM.app.classList.add("active");
+}
 
-  if (event.action === "deactivate_alarm") {
-    state.alarmActive = false;
-  }
+function applyBootstrap(payload) {
+  state.currentUser = normalizeUser(payload.currentUser);
+  state.users = (payload.users || []).map(normalizeUser);
+  state.events = (payload.events || []).map(normalizeEvent);
+}
 
+async function refreshData() {
+  const payload = await api.bootstrap();
+  applyBootstrap(payload);
   renderAll();
 }
 
-function getEventsInLast24Hours() {
-  const cutoff = Date.now() - HOURS_24_MS;
-  return state.events.filter((entry) => entry.timestamp.getTime() >= cutoff);
-}
-
-function getFilteredEvents() {
-  const searchQuery = DOM.log.searchInput.value.trim().toLowerCase();
-  const windowMs = FILTER_WINDOWS[DOM.log.timeFilter.value] ?? FILTER_WINDOWS.all;
-  const cutoff = Date.now() - windowMs;
-
-  return state.events.filter((entry) => {
-    const isWithinTimeRange = Number.isFinite(windowMs) ? entry.timestamp.getTime() >= cutoff : true;
-    if (!isWithinTimeRange) return false;
-
-    if (!searchQuery) return true;
-
-    const payload = `${entry.name} ${getActionLabel(entry.action)}`.toLowerCase();
-    return payload.includes(searchQuery);
-  });
-}
-
 function renderTopbar() {
-  const name = state.currentUser?.name || "bruker";
-  const role = state.currentUser?.role || "gjest";
-
-  DOM.welcomeText.textContent = toTitleCase(name);
-  DOM.rolePill.textContent = role;
+  DOM.topbarName.textContent = state.currentUser?.name || "Bruker";
+  DOM.topbarRole.textContent = roleBadgeLabel(state.currentUser?.role);
+  DOM.adminNavBtn.classList.toggle("hidden", !isAdmin());
 }
 
 function renderDashboard() {
-  const lastUnlock = findLatestEventByAction("unlock_door");
-  const lastDeactivate = findLatestEventByAction("deactivate_alarm");
-  const lastAlarmChange = findLatestAlarmChange();
+  const events = sortedEvents();
+  const now = Date.now();
+  const eventsLast24Hours = events.filter((event) => now - new Date(event.ts).getTime() < 24 * 60 * 60 * 1000);
+  const lastUnlock = events.find((event) => event.action === "unlock_door");
+  const lastDeactivate = events.find((event) => event.action === "deactivate_alarm");
+  const lastAlarmChange = events.find((event) => event.action === "activate_alarm" || event.action === "deactivate_alarm");
 
-  DOM.dashboard.alarmStatusText.textContent = state.alarmActive ? "AKTIVERT" : "DEAKTIVERT";
-  DOM.dashboard.alarmStatusText.classList.toggle("status-on", state.alarmActive);
-  DOM.dashboard.alarmStatusText.classList.toggle("status-off", !state.alarmActive);
-
-  if (lastAlarmChange) {
-    DOM.dashboard.alarmStatusMeta.textContent = `Sist endret av: ${lastAlarmChange.name} (${formatTime(lastAlarmChange.timestamp)})`;
-  } else {
-    DOM.dashboard.alarmStatusMeta.textContent = "Sist endret: -";
-  }
+  DOM.eventCount.textContent = String(eventsLast24Hours.length);
 
   if (lastUnlock) {
-    DOM.dashboard.lastUnlockTime.textContent = `${formatTime(lastUnlock.timestamp)}`;
-    DOM.dashboard.lastUnlockUser.textContent = `Bruker: ${lastUnlock.name}`;
+    DOM.lastUnlock.textContent = fmtTime(lastUnlock.ts);
+    DOM.lastUnlockSub.textContent = joinMeta([lastUnlock.name, lastUnlock.room, fmtDate(lastUnlock.ts)]);
   } else {
-    DOM.dashboard.lastUnlockTime.textContent = "-";
-    DOM.dashboard.lastUnlockUser.textContent = "Bruker: -";
+    DOM.lastUnlock.textContent = "-";
+    DOM.lastUnlockSub.textContent = "Ingen opplåsinger registrert";
   }
 
   if (lastDeactivate) {
-    DOM.dashboard.lastDeactivateTime.textContent = `${formatTime(lastDeactivate.timestamp)}`;
-    DOM.dashboard.lastDeactivateUser.textContent = `Bruker: ${lastDeactivate.name}`;
+    DOM.lastDeact.textContent = fmtTime(lastDeactivate.ts);
+    DOM.lastDeactSub.textContent = joinMeta([lastDeactivate.name, lastDeactivate.room, fmtDate(lastDeactivate.ts)]);
   } else {
-    DOM.dashboard.lastDeactivateTime.textContent = "-";
-    DOM.dashboard.lastDeactivateUser.textContent = "Bruker: -";
+    DOM.lastDeact.textContent = "-";
+    DOM.lastDeactSub.textContent = "Ingen deaktiveringer registrert";
   }
 
-  DOM.dashboard.eventsLastDay.textContent = String(getEventsInLast24Hours().length);
+  if (lastAlarmChange) {
+    const isActive = lastAlarmChange.action === "activate_alarm";
+    DOM.alarmStatus.textContent = isActive ? "AKTIVERT" : "DEAKTIVERT";
+    DOM.alarmStatus.style.color = isActive ? "var(--red)" : "var(--green)";
+    DOM.alarmSub.textContent = joinMeta([
+      `${isActive ? "Aktivert" : "Deaktivert"} av ${lastAlarmChange.name}`,
+      lastAlarmChange.room,
+      `${fmtDate(lastAlarmChange.ts)} ${fmtTime(lastAlarmChange.ts)}`
+    ]);
+  } else {
+    DOM.alarmStatus.textContent = "UKJENT";
+    DOM.alarmStatus.style.color = "var(--hint)";
+    DOM.alarmSub.textContent = "Ingen alarmhendelser registrert";
+  }
 
-  const recentRows = state.events.slice(0, 6);
-  DOM.dashboard.recentOpenList.innerHTML = recentRows.length
-    ? recentRows
-        .map((entry) => {
-          const name = escapeHtml(entry.name);
-          const action = escapeHtml(getActionLabel(entry.action));
-          const time = escapeHtml(formatTime(entry.timestamp));
-          const date = escapeHtml(formatDate(entry.timestamp));
-          return `<li><strong>${name}</strong> — ${action} <span style="opacity:0.6;font-size:0.8em;font-family:var(--font-mono)">${time} · ${date}</span></li>`;
-        })
-        .join("")
-    : "<li>Ingen hendelser registrert.</li>";
+  renderFeed(events.slice(0, 8));
 }
 
-function renderLog() {
-  const rows = getFilteredEvents();
-
-  if (!rows.length) {
-    DOM.log.tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:24px">Ingen hendelser funnet.</td></tr>';
+function renderFeed(events) {
+  if (!events.length) {
+    DOM.eventsFeed.innerHTML = `<div class="empty-state"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5"></rect><path d="M10 12h12M10 16h8M10 20h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg><p>Ingen hendelser ennå</p></div>`;
     return;
   }
 
-  DOM.log.tableBody.innerHTML = rows
-    .map((entry) => {
-      const name = escapeHtml(entry.name);
-      const action = escapeHtml(getActionLabel(entry.action));
-      const date = escapeHtml(formatDate(entry.timestamp));
-      const time = escapeHtml(formatTime(entry.timestamp));
+  DOM.eventsFeed.innerHTML = events
+    .map((event) => {
+      const badge = actionBadge(event.action);
+      return `<div class="event-item">
+        <div class="avatar">${escapeHtml(initialsFor(event.name))}</div>
+        <div class="event-body">
+          <div class="event-top">
+            <span class="event-name">${escapeHtml(event.name)}</span>
+            <span class="type-badge ${badge.badgeClass}">${escapeHtml(badge.badgeText)}</span>
+          </div>
+          <div class="event-meta">${escapeHtml(joinMeta([actionLabel(event.action), event.room || "Ukjent plassering", fmtTime(event.ts), fmtDate(event.ts)]))}</div>
+        </div>
+      </div>`;
+    })
+    .join("");
+}
 
-      return `
-        <tr>
-          <td>${name}</td>
-          <td>${action}</td>
-          <td>${date}</td>
-          <td style="font-family:var(--font-mono);font-size:0.82rem">${time}</td>
-        </tr>
-      `;
+function filteredEvents() {
+  const query = DOM.logSearch.value.trim().toLowerCase();
+  const actionFilter = DOM.logTypeFilter.value;
+  const hours = Number(DOM.logTimeFilter.value || "0");
+  const threshold = hours > 0 ? Date.now() - hours * 60 * 60 * 1000 : 0;
+
+  return sortedEvents().filter((event) => {
+    const matchesQuery =
+      !query ||
+      event.name.toLowerCase().includes(query) ||
+      actionLabel(event.action).toLowerCase().includes(query);
+    const matchesAction = !actionFilter || event.action === actionFilter;
+    const matchesTime = !hours || new Date(event.ts).getTime() >= threshold;
+    return matchesQuery && matchesAction && matchesTime;
+  });
+}
+
+function renderLog() {
+  const rows = filteredEvents();
+  const total = rows.length;
+  const maxPage = Math.max(0, Math.ceil(total / state.logPageSize) - 1);
+
+  if (state.logPage > maxPage) {
+    state.logPage = maxPage;
+  }
+
+  const start = state.logPage * state.logPageSize;
+  const pageRows = rows.slice(start, start + state.logPageSize);
+  const from = total ? start + 1 : 0;
+  const to = Math.min(start + state.logPageSize, total);
+
+  DOM.logCount.textContent = `Viser ${from}-${to} av ${total} hendelser`;
+
+  if (!pageRows.length) {
+    DOM.logBody.innerHTML = `<div class="empty-state" style="padding:32px"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="4" stroke="currentColor" stroke-width="1.5"></rect><path d="M9 11h10M9 15h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg><p>Ingen hendelser funnet</p></div>`;
+    return;
+  }
+
+  DOM.logBody.innerHTML = pageRows
+    .map((event) => {
+      const badge = actionBadge(event.action);
+      return `<div class="log-row">
+        <div class="log-name">
+          <div class="avatar" style="width:26px;height:26px;font-size:9px">${escapeHtml(initialsFor(event.name))}</div>
+          <span class="log-name-text">${escapeHtml(event.name)}</span>
+        </div>
+        <div class="log-action">
+          <span class="type-badge ${badge.badgeClass}">${escapeHtml(badge.badgeText)}</span>
+          <span>${escapeHtml(actionLabel(event.action))}</span>
+        </div>
+        <div class="log-cell">${escapeHtml(event.room || "-")}</div>
+        <div class="log-cell">${escapeHtml(fmtDate(event.ts))}</div>
+        <div class="log-cell">${escapeHtml(fmtTime(event.ts))}</div>
+      </div>`;
     })
     .join("");
 }
 
 function renderUsers() {
-  DOM.users.tableBody.innerHTML = state.users
-    .map((user) => {
-      const name = escapeHtml(user.name);
-      const cardId = escapeHtml(user.cardId);
-      const roleBadge = renderRoleBadge(user.role);
-      const email = escapeHtml(user.email);
+  const query = DOM.usersSearch.value.trim().toLowerCase();
+  const filtered = state.users.filter((user) => {
+    const matchesQuery =
+      !query ||
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.cardId.toLowerCase().includes(query);
+    const matchesRole = !state.roleFilter || user.role === state.roleFilter;
+    return matchesQuery && matchesRole;
+  });
 
-      return `
-        <tr>
-          <td>${name}</td>
-          <td><code>${cardId}</code></td>
-          <td>${roleBadge}</td>
-          <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--muted)">${email}</td>
-        </tr>
-      `;
+  DOM.usersCount.textContent = `${filtered.length} bruker${filtered.length === 1 ? "" : "e"}`;
+
+  if (!filtered.length) {
+    DOM.usersBody.innerHTML = `<div class="empty-state" style="padding:28px"><p>Ingen brukere funnet</p></div>`;
+    return;
+  }
+
+  DOM.usersBody.innerHTML = filtered
+    .map((user) => {
+      const roleClass = user.role === "owner" ? "owner" : user.role === "admin" ? "admin" : "guest";
+      return `<div class="users-row">
+        <div class="user-cell">
+          <div class="avatar" style="width:30px;height:30px;font-size:10px">${escapeHtml(initialsFor(user.name))}</div>
+          <div class="user-cell-text">
+            <div class="name">${escapeHtml(user.name)}</div>
+            <div class="email">${escapeHtml(user.email || "-")}</div>
+          </div>
+        </div>
+        <span class="kortid-badge">${escapeHtml(user.cardId || "-")}</span>
+        <span class="role-pill ${roleClass}">${escapeHtml(roleLabel(user.role))}</span>
+        <span style="font-size:12px;color:var(--muted);font-family:var(--mono)">${escapeHtml(user.email || "-")}</span>
+      </div>`;
     })
     .join("");
 }
 
 function renderAdmin() {
-  DOM.admin.lockedNote.classList.toggle("hidden", isAdmin());
-  DOM.admin.content.classList.toggle("hidden", !isAdmin());
+  const adminView = isAdmin();
 
-  if (!isAdmin()) {
+  DOM.adminNote.classList.toggle("hidden", adminView);
+  DOM.adminContent.classList.toggle("hidden", !adminView);
+
+  if (!adminView) {
     return;
   }
 
-  DOM.admin.tableBody.innerHTML = state.users
-    .map((user) => {
-      const name = escapeHtml(user.name);
-      const cardId = escapeHtml(user.cardId);
-      const role = user.role;
+  if (!state.users.length) {
+    DOM.adminBody.innerHTML = `<div class="empty-state" style="padding:24px"><p>Ingen brukere registrert</p></div>`;
+    DOM.adminSaveRow.classList.add("hidden");
+    return;
+  }
 
-      return `
-        <tr data-card="${cardId}">
-          <td><input class="inline-input" data-field="name" value="${name}" /></td>
-          <td><code>${cardId}</code></td>
-          <td>
-            <select class="inline-select" data-field="role">
-              <option value="gjest" ${role === "gjest" ? "selected" : ""}>gjest</option>
-              <option value="admin" ${role === "admin" ? "selected" : ""}>admin</option>
-            </select>
-          </td>
-          <td>
-            <div class="admin-actions">
-              <button class="btn tiny ghost" data-action="save" type="button">Lagre</button>
-              <button class="btn tiny danger" data-action="remove" type="button">Fjern</button>
-            </div>
-          </td>
-        </tr>
-      `;
+  DOM.adminBody.innerHTML = state.users
+    .map((user) => {
+      return `<div class="admin-row" data-card-id="${escapeHtml(user.cardId)}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar" style="width:26px;height:26px;font-size:9px">${escapeHtml(initialsFor(user.name))}</div>
+          <input class="inline-input" data-field="name" value="${escapeHtml(user.name)}" aria-label="Navn">
+        </div>
+        <span class="kortid-badge">${escapeHtml(user.cardId || "-")}</span>
+        <select class="inline-select" data-field="role" aria-label="Rolle" ${user.role === "owner" ? "disabled" : ""}>
+          <option value="owner" ${user.role === "owner" ? "selected" : ""}>Eier</option>
+          <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+          <option value="gjest" ${user.role === "gjest" ? "selected" : ""}>Gjest</option>
+        </select>
+        <div style="display:flex;gap:6px">
+          <button class="btn-remove" type="button" data-remove-card="${escapeHtml(user.cardId)}" ${user.role === "owner" ? "disabled" : ""}>Fjern</button>
+        </div>
+      </div>`;
     })
     .join("");
+
+  DOM.adminSaveRow.classList.remove("hidden");
 }
 
 function renderAll() {
   renderTopbar();
   renderDashboard();
-  renderLog();
   renderUsers();
   renderAdmin();
+  if (state.activePage === "log") renderLog();
 }
 
-function setAuthView(viewName) {
-  const safeView = viewName === "signup" ? "signup" : "login";
-  state.activeAuthView = safeView;
-
-  DOM.authSwitchButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.authView === safeView);
-  });
-
-  DOM.loginSection.classList.toggle("hidden", safeView !== "login");
-  DOM.signUpSection.classList.toggle("hidden", safeView !== "signup");
-  DOM.otpSection.classList.add("hidden");
-  state.pendingAccount = null;
-  DOM.otpForm.reset();
-}
-
-function setView(viewName) {
-  state.activeView = viewName;
-
-  DOM.tabs.forEach((button) => {
-    button.classList.toggle("active", button.dataset.view === viewName);
-  });
-
-  DOM.views.forEach((view) => {
-    view.classList.toggle("active", view.id === `view-${viewName}`);
-  });
-}
-
-function showApp() {
-  DOM.authPanel.classList.add("hidden");
-  DOM.appPanel.classList.remove("hidden");
-  DOM.topbar.classList.remove("hidden");
-
-  setView(state.activeView);
-  renderAll();
-}
-
-function showAuth() {
-  DOM.authPanel.classList.remove("hidden");
-  DOM.appPanel.classList.add("hidden");
-  DOM.topbar.classList.add("hidden");
-
-  hideWelcomePopup();
-  hideMessage(DOM.authMessage);
-  hideMessage(DOM.appMessage);
-
-  DOM.loginForm.reset();
-  DOM.signUpForm.reset();
-  DOM.otpForm.reset();
-  setAuthView("login");
-}
-
-function handleLoginSubmit(event) {
+async function handleLogin(event) {
   event.preventDefault();
-  hideMessage(DOM.authMessage);
+  setAuthError("");
 
-  const email = normalizeEmail(DOM.emailInput.value);
-  const password = DOM.passwordInput.value;
+  const email = DOM.loginEmail.value.trim();
+  const password = DOM.loginPassword.value;
 
-  const account = state.accounts.find((item) => item.email === email && item.password === password);
-
-  if (!account) {
-    showMessage(DOM.authMessage, "Feil brukernavn eller passord.", "error");
+  if (!email || !password) {
+    setAuthError("Fyll inn e-postadresse og passord.");
     return;
   }
 
-  state.pendingAccount = account;
-  DOM.loginSection.classList.add("hidden");
-  DOM.otpSection.classList.remove("hidden");
-  DOM.otpHint.textContent = `Kode sendt til ${account.email}. Bekreftelseskode: ${account.otp}`;
-  showMessage(DOM.authMessage, "Kode sendt til e-post.", "success");
+  try {
+    const result = await api.login(email, password);
+    showOtpPanel(result.email, result.otpPreview, "Bekreftelseskode sendt");
+    toast(result.message, "success");
+  } catch (error) {
+    setAuthError(error.message);
+  }
 }
 
-function handleSignUpSubmit(event) {
+async function handleSendCode() {
+  if (!DOM.loginEmail.value.trim() || !DOM.loginPassword.value) {
+    setAuthError("Skriv inn e-postadresse og passord først.");
+    return;
+  }
+
+  await handleLogin(new Event("submit", { cancelable: true }));
+}
+
+async function handleRegister(event) {
   event.preventDefault();
-  hideMessage(DOM.authMessage);
+  setAuthError("");
 
-  const name = normalizeName(DOM.signUpNameInput.value);
-  const email = normalizeEmail(DOM.signUpEmailInput.value);
-  const password = DOM.signUpPasswordInput.value;
-  const confirmPassword = DOM.signUpConfirmPasswordInput.value;
+  const name = DOM.regName.value.trim();
+  const email = DOM.regEmail.value.trim();
+  const password = DOM.regPassword.value;
+  const cardId = DOM.regCardId.value.trim().toUpperCase();
 
-  if (name.length < 2) {
-    showMessage(DOM.authMessage, "Skriv inn et gyldig navn.", "error");
+  if (!name || !email || !password) {
+    setAuthError("Fyll inn alle feltene.");
     return;
   }
 
-  if (password.length < 4) {
-    showMessage(DOM.authMessage, "Passordet må være minst 4 tegn.", "error");
-    return;
+  try {
+    const result = await api.signup({ name, email, password, cardId });
+    showOtpPanel(result.email, result.otpPreview, "Konto opprettet");
+    toast(result.message, "success");
+  } catch (error) {
+    setAuthError(error.message);
   }
-
-  if (password !== confirmPassword) {
-    showMessage(DOM.authMessage, "Passordene er ikke like.", "error");
-    return;
-  }
-
-  if (state.accounts.some((account) => account.email === email)) {
-    showMessage(DOM.authMessage, "E-postadressen finnes allerede.", "error");
-    return;
-  }
-
-  const cardId = generateUniqueCardId();
-  const otp = generateOtp();
-  const account = {
-    email,
-    password,
-    otp,
-    name,
-    role: "gjest",
-    cardId
-  };
-
-  state.accounts.push(account);
-  state.users.push(mapAccountToUser(account));
-
-  DOM.signUpForm.reset();
-  DOM.emailInput.value = email;
-  setAuthView("login");
-  showMessage(DOM.authMessage, `Konto opprettet. Bekreftelseskode: ${otp}`, "success");
 }
 
-function handleOtpSubmit(event) {
+async function handleOtp(event) {
   event.preventDefault();
-  hideMessage(DOM.authMessage);
+  setAuthError("");
 
-  const otp = DOM.otpInput.value.trim();
-
-  if (!state.pendingAccount) {
-    showMessage(DOM.authMessage, "Innloggingen utløp. Prøv igjen.", "error");
-    DOM.loginSection.classList.remove("hidden");
-    DOM.otpSection.classList.add("hidden");
+  const code = DOM.otpCode.value.trim();
+  if (!state.pendingEmail || !code) {
+    setAuthError("Skriv inn bekreftelseskoden.");
     return;
   }
 
-  if (otp !== state.pendingAccount.otp) {
-    showMessage(DOM.authMessage, "Ugyldig bekreftelseskode.", "error");
-    return;
+  try {
+    const result = await api.verifyOtp(state.pendingEmail, code);
+    storage.setToken(result.token);
+    await refreshData();
+    showAppShell();
+    showPage("dashboard");
+    toast("Innlogging fullført", "success");
+  } catch (error) {
+    setAuthError(error.message);
   }
-
-  state.currentUser = {
-    email: state.pendingAccount.email,
-    name: state.pendingAccount.name,
-    role: state.pendingAccount.role,
-    cardId: state.pendingAccount.cardId
-  };
-
-  state.pendingAccount = null;
-  showMessage(DOM.authMessage, "Innlogging fullført.", "success");
-  showApp();
-  showWelcomePopup(state.currentUser.name);
 }
 
-function handleBackFromOtp() {
-  state.pendingAccount = null;
-  hideMessage(DOM.authMessage);
+function handleOtpBack() {
   DOM.otpForm.reset();
-  DOM.otpSection.classList.add("hidden");
-  setAuthView("login");
+  showAuthTab("login");
+  setInfo("Systemet bruker ekte brukere. Opprett den første kontoen under <strong>Opprett konto</strong>.");
 }
 
-function handleLogout() {
+async function handleLogout() {
+  try {
+    if (storage.getToken()) {
+      await api.logout();
+    }
+  } catch (error) {
+    // Ignore logout errors.
+  }
+
+  storage.clearToken();
   state.currentUser = null;
-  state.pendingAccount = null;
-  showAuth();
+  state.users = [];
+  state.events = [];
+  state.pendingEmail = "";
+  showLoginPage();
+  showAuthTab("login");
 }
 
-function handleAuthSwitch(event) {
-  const target = event.currentTarget;
-  const viewName = target.dataset.authView;
-  hideMessage(DOM.authMessage);
-  setAuthView(viewName);
-}
-
-function handleTabClick(event) {
-  const target = event.currentTarget;
-  setView(target.dataset.view);
-  hideMessage(DOM.appMessage);
-}
-
-function handleSimulateEvent(event) {
-  event.preventDefault();
-  hideMessage(DOM.appMessage);
-
-  const cardId = normalizeCardId(DOM.simulator.cardIdInput.value);
-  const action = DOM.simulator.actionInput.value;
-  const room = DOM.simulator.roomInput.value.trim();
-  const matchedUser = findUserByCardId(cardId);
-
-  addEvent({
-    name: matchedUser ? matchedUser.name : "Ukjent kort",
-    cardId,
-    action,
-    room
-  });
-
-  DOM.simulator.form.reset();
-  showMessage(DOM.appMessage, "Ny hendelse lagt til i loggen.", "success");
-}
-
-function handleAddUser(event) {
+async function handleSimSubmit(event) {
   event.preventDefault();
 
-  if (!isAdmin()) {
-    showMessage(DOM.appMessage, "Kun admin kan legge til brukere.", "error");
+  const cardId = DOM.simCardId.value.trim().toUpperCase();
+  const action = DOM.simAction.value;
+  const room = DOM.simRoom.value.trim();
+
+  if (!cardId || !room) {
+    toast("Fyll inn kort-ID og rom.", "error");
     return;
   }
 
-  const name = DOM.admin.newNameInput.value.trim();
-  const cardId = normalizeCardId(DOM.admin.newCardIdInput.value);
-  const role = DOM.admin.newRoleInput.value;
-  const email = normalizeEmail(DOM.admin.newEmailInput.value);
-
-  if (state.users.some((user) => normalizeCardId(user.cardId) === cardId)) {
-    showMessage(DOM.appMessage, "Kort-ID finnes allerede.", "error");
-    return;
+  try {
+    await api.createEvent({ cardId, action, room });
+    await refreshData();
+    DOM.simForm.reset();
+    toast("Hendelsen ble registrert.", "success");
+  } catch (error) {
+    toast(error.message, "error");
   }
-
-  if (state.accounts.some((account) => account.email === email)) {
-    showMessage(DOM.appMessage, "E-post finnes allerede.", "error");
-    return;
-  }
-
-  state.users.push({ name, cardId, role, email });
-
-  const generatedOtp = String(Math.floor(100000 + Math.random() * 900000));
-  state.accounts.push({
-    name,
-    cardId,
-    role,
-    email,
-    password: "1234",
-    otp: generatedOtp
-  });
-
-  DOM.admin.addUserForm.reset();
-  renderAll();
-  showMessage(DOM.appMessage, `Bruker ${name} lagt til. OTP-kode: ${generatedOtp}`, "success");
 }
 
-function handleAdminTableClick(event) {
+function handleSimClear() {
+  DOM.simForm.reset();
+}
+
+function resetLogPage() {
+  state.logPage = 0;
+  renderLog();
+}
+
+function changeLogPage(delta) {
+  const rows = filteredEvents();
+  const maxPage = Math.max(0, Math.ceil(rows.length / state.logPageSize) - 1);
+  state.logPage = Math.max(0, Math.min(maxPage, state.logPage + delta));
+  renderLog();
+}
+
+function exportCsv() {
+  const rows = filteredEvents();
+  const header = "Navn,Handling,Rom,Dato,Tid";
+  const body = rows.map((event) => `"${event.name}","${actionLabel(event.action)}","${event.room || ""}","${fmtDate(event.ts)}","${fmtTime(event.ts)}"`);
+  const blob = new Blob([[header, ...body].join("\n")], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `hendelseslogg_${fmtDate(new Date().toISOString()).replaceAll(".", "-")}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  toast("CSV-filen ble eksportert.", "success");
+}
+
+function setRoleFilter(role, button) {
+  state.roleFilter = role;
+  DOM.roleTabs.forEach((tab) => {
+    tab.classList.toggle("active", tab === button);
+  });
+  renderUsers();
+}
+
+function generateCardId() {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+async function handleAddUser(event) {
+  event.preventDefault();
+
+  const name = DOM.addName.value.trim();
+  const email = DOM.addEmail.value.trim();
+  const role = DOM.addRole.value === "admin" ? "admin" : "gjest";
+  const cardId = (DOM.addCardId.value.trim() || generateCardId()).toUpperCase();
+
+  if (!name || !email) {
+    toast("Navn og e-postadresse er påkrevd.", "error");
+    return;
+  }
+
+  try {
+    const result = await api.addUser({ name, email, role, cardId });
+    await refreshData();
+    DOM.adminAddForm.reset();
+    toast(`${result.message} Midlertidig passord: ${result.defaultPassword}. Bekreftelseskode: ${result.otpPreview}`, "success");
+  } catch (error) {
+    toast(error.message, "error");
+  }
+}
+
+async function handleAdminBodyClick(event) {
   const target = event.target;
-  if (!(target instanceof HTMLElement)) return;
-
-  const action = target.dataset.action;
-  if (!action) return;
-
-  if (!isAdmin()) {
-    showMessage(DOM.appMessage, "Kun admin kan gjøre endringer her.", "error");
+  if (!(target instanceof HTMLElement)) {
     return;
   }
 
-  const row = target.closest("tr");
-  if (!row) return;
-
-  const cardId = row.dataset.card;
-  if (!cardId) return;
-
-  const { userIndex, accountIndex } = findUserAndAccountIndexes(cardId);
-  if (userIndex === -1 || accountIndex === -1) {
-    showMessage(DOM.appMessage, "Fant ikke brukeren.", "error");
+  const removeCardId = target.getAttribute("data-remove-card");
+  if (!removeCardId) {
     return;
   }
 
-  if (action === "remove") {
-    const removedUser = state.users[userIndex];
+  if (!confirm("Er du sikker på at du vil fjerne denne brukeren?")) {
+    return;
+  }
 
-    if (removedUser.role === "admin" && getAdminCount() === 1) {
-      showMessage(DOM.appMessage, "Du kan ikke slette den siste admin-brukeren.", "error");
+  try {
+    await api.deleteUser(removeCardId);
+    if (state.currentUser?.cardId === removeCardId) {
+      storage.clearToken();
+      state.currentUser = null;
+      state.users = [];
+      state.events = [];
+      showLoginPage();
+      showAuthTab("login");
+      toast("Brukeren din ble fjernet. Du er logget ut.", "success");
       return;
     }
 
-    state.users.splice(userIndex, 1);
-    state.accounts.splice(accountIndex, 1);
+    await refreshData();
+    toast("Brukeren ble fjernet.", "success");
+  } catch (error) {
+    toast(error.message, "error");
+  }
+}
 
-    if (state.currentUser?.cardId === removedUser.cardId) {
-      handleLogout();
-      return;
+function handleAdminBodyChange() {
+  DOM.adminSaveRow.classList.remove("hidden");
+}
+
+async function handleSaveRoles() {
+  const rows = Array.from(DOM.adminBody.querySelectorAll("[data-card-id]"));
+
+  try {
+    for (const row of rows) {
+      const cardId = row.getAttribute("data-card-id");
+      const nameInput = row.querySelector('[data-field="name"]');
+      const roleInput = row.querySelector('[data-field="role"]');
+
+      if (!(nameInput instanceof HTMLInputElement) || !(roleInput instanceof HTMLSelectElement)) {
+        continue;
+      }
+
+      await api.updateUser(cardId, {
+        name: nameInput.value.trim(),
+        role: roleInput.value
+      });
     }
 
-    renderAll();
-    showMessage(DOM.appMessage, `Bruker ${removedUser.name} fjernet.`, "success");
-    return;
-  }
-
-  if (action !== "save") {
-    return;
-  }
-
-  const nameInput = row.querySelector('input[data-field="name"]');
-  const roleInput = row.querySelector('select[data-field="role"]');
-  if (!(nameInput instanceof HTMLInputElement) || !(roleInput instanceof HTMLSelectElement)) {
-    return;
-  }
-
-  const newName = nameInput.value.trim();
-  const newRole = roleInput.value;
-
-  if (!newName) {
-    showMessage(DOM.appMessage, "Navn kan ikke være tomt.", "error");
-    return;
-  }
-
-  if (state.users[userIndex].role === "admin" && newRole !== "admin" && getAdminCount() === 1) {
-    showMessage(DOM.appMessage, "Du kan ikke fjerne admin fra den siste admin-brukeren.", "error");
-    return;
-  }
-
-  state.users[userIndex].name = newName;
-  state.users[userIndex].role = newRole;
-  state.accounts[accountIndex].name = newName;
-  state.accounts[accountIndex].role = newRole;
-
-  if (state.currentUser?.cardId === cardId) {
-    state.currentUser.name = newName;
-    state.currentUser.role = newRole;
-  }
-
-  renderAll();
-  showMessage(DOM.appMessage, `Oppdatert ${newName}.`, "success");
-}
-
-function initTheme() {
-  const saved = localStorage.getItem("theme");
-  if (saved === "light") {
-    document.documentElement.setAttribute("data-theme", "light");
+    await refreshData();
+    DOM.adminSaveRow.classList.add("hidden");
+    toast("Endringene ble lagret.", "success");
+  } catch (error) {
+    toast(error.message, "error");
   }
 }
 
-function initDemoHint() {
-  const adminEmail = ["admin", "@", "example.com"].join("");
-  const guestEmail = ["kevin", "@", "example.com"].join("");
-
-  // Fill email spans via JS so Cloudflare doesn't scramble them
-  document.querySelectorAll(".demo-email-admin").forEach(el => { el.textContent = adminEmail; });
-  document.querySelectorAll(".demo-email-guest").forEach(el => { el.textContent = guestEmail; });
-
-  // Admin fill button
-  const fillAdminBtn = document.getElementById("fill-demo-btn");
-  if (fillAdminBtn) {
-    fillAdminBtn.addEventListener("click", () => {
-      setAuthView("login");
-      DOM.emailInput.value = adminEmail;
-      DOM.passwordInput.value = "1234";
-      DOM.passwordInput.focus();
-    });
+async function handleClearEvents() {
+  if (!confirm("Slett alle hendelser? Dette kan ikke angres.")) {
+    return;
   }
 
-  // Guest fill button
-  const fillGuestBtn = document.getElementById("fill-demo-guest-btn");
-  if (fillGuestBtn) {
-    fillGuestBtn.addEventListener("click", () => {
-      setAuthView("login");
-      DOM.emailInput.value = guestEmail;
-      DOM.passwordInput.value = "1234";
-      DOM.passwordInput.focus();
-    });
+  try {
+    await api.clearEvents();
+    await refreshData();
+    toast("Alle hendelser ble slettet.", "success");
+  } catch (error) {
+    toast(error.message, "error");
   }
-
-  // Close button — hides the bar
 }
 
-function toggleTheme() {
-  const isLight = document.documentElement.getAttribute("data-theme") === "light";
-  if (isLight) {
-    document.documentElement.removeAttribute("data-theme");
-    localStorage.setItem("theme", "dark");
-  } else {
-    document.documentElement.setAttribute("data-theme", "light");
-    localStorage.setItem("theme", "light");
+function togglePassword(button) {
+  const inputId = button.dataset.togglePassword;
+  const input = document.getElementById(inputId);
+
+  if (!(input instanceof HTMLInputElement)) {
+    return;
+  }
+
+  input.type = input.type === "password" ? "text" : "password";
+  button.style.opacity = input.type === "text" ? "1" : "0.5";
+}
+
+function toast(message, type = "success") {
+  const toastElement = document.createElement("div");
+  toastElement.className = `toast ${type}`;
+  const icon =
+    type === "success"
+      ? `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="#22c55e" opacity=".2"></circle><path d="M4 7l2 2 4-4" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"></path></svg>`
+      : `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="#ef4444" opacity=".2"></circle><path d="M5 5l4 4M9 5l-4 4" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"></path></svg>`;
+
+  toastElement.innerHTML = `${icon}${escapeHtml(message)}`;
+  DOM.toastContainer.appendChild(toastElement);
+  window.setTimeout(() => toastElement.remove(), 3000);
+}
+
+async function restoreSession() {
+  const token = storage.getToken();
+  if (!token) {
+    showLoginPage();
+    showAuthTab("login");
+    return;
+  }
+
+  try {
+    await refreshData();
+    showAppShell();
+    showPage(state.activePage);
+  } catch (error) {
+    storage.clearToken();
+    showLoginPage();
+    showAuthTab("login");
   }
 }
 
 function bindEvents() {
-  DOM.authSwitchButtons.forEach((button) => {
-    button.addEventListener("click", handleAuthSwitch);
+  DOM.authTabs.forEach((button) => {
+    button.addEventListener("click", () => showAuthTab(button.dataset.authTab));
   });
 
-  DOM.loginForm.addEventListener("submit", handleLoginSubmit);
-  DOM.signUpForm.addEventListener("submit", handleSignUpSubmit);
-  DOM.otpForm.addEventListener("submit", handleOtpSubmit);
-  DOM.backBtn.addEventListener("click", handleBackFromOtp);
+  DOM.loginForm.addEventListener("submit", handleLogin);
+  DOM.loginSendCode.addEventListener("click", handleSendCode);
+  DOM.forgotBtn.addEventListener("click", () => toast("Kontakt en administrator for å bytte passord.", "success"));
+  DOM.registerForm.addEventListener("submit", handleRegister);
+  DOM.otpForm.addEventListener("submit", handleOtp);
+  DOM.otpBack.addEventListener("click", handleOtpBack);
+
+  document.querySelectorAll("[data-toggle-password]").forEach((button) => {
+    button.addEventListener("click", () => togglePassword(button));
+  });
+
+  DOM.themeToggle.addEventListener("click", () => toast("Lys modus er ikke tilgjengelig ennå.", "success"));
   DOM.logoutBtn.addEventListener("click", handleLogout);
-  DOM.popupCloseBtn.addEventListener("click", hideWelcomePopup);
 
-  const themeBtn = document.getElementById("theme-toggle-btn");
-  if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
-
-  DOM.tabs.forEach((tab) => {
-    tab.addEventListener("click", handleTabClick);
+  DOM.navItems.forEach((item) => {
+    item.addEventListener("click", () => showPage(item.dataset.page));
   });
 
-  DOM.simulator.form.addEventListener("submit", handleSimulateEvent);
-  DOM.log.searchInput.addEventListener("input", renderLog);
-  DOM.log.timeFilter.addEventListener("change", renderLog);
+  DOM.simForm.addEventListener("submit", handleSimSubmit);
+  DOM.simClear.addEventListener("click", handleSimClear);
 
-  DOM.admin.addUserForm.addEventListener("submit", handleAddUser);
-  DOM.admin.tableBody.addEventListener("click", handleAdminTableClick);
+  DOM.logSearch.addEventListener("input", resetLogPage);
+  DOM.logTypeFilter.addEventListener("change", resetLogPage);
+  DOM.logTimeFilter.addEventListener("change", resetLogPage);
+  DOM.logPrev.addEventListener("click", () => changeLogPage(-1));
+  DOM.logNext.addEventListener("click", () => changeLogPage(1));
+  DOM.exportBtn.addEventListener("click", exportCsv);
+
+  DOM.usersSearch.addEventListener("input", renderUsers);
+  DOM.roleTabs.forEach((button) => {
+    button.addEventListener("click", () => setRoleFilter(button.dataset.roleFilter, button));
+  });
+
+  DOM.autoCardId.addEventListener("click", () => {
+    DOM.addCardId.value = generateCardId();
+  });
+  DOM.adminAddForm.addEventListener("submit", handleAddUser);
+  DOM.adminBody.addEventListener("click", handleAdminBodyClick);
+  DOM.adminBody.addEventListener("change", handleAdminBodyChange);
+  DOM.saveRolesBtn.addEventListener("click", handleSaveRoles);
+  DOM.clearEventsBtn.addEventListener("click", handleClearEvents);
 }
 
-function init() {
-  initTheme();
-  initDemoHint();
+async function init() {
   bindEvents();
-  showAuth();
+  await restoreSession();
 }
 
 init();

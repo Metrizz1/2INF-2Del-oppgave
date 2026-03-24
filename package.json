@@ -1,0 +1,18 @@
+{
+  "name": "secureaccess-mysql",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SecureAccess demo with Node.js and MySQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "db:init": "node init-db-safe.js",
+    "db:seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0"
+  }
+}
