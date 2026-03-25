@@ -6,7 +6,7 @@
   <title>SecureAccess V2 - Adgangskontroll</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Syne:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -131,8 +131,8 @@
           <span id="topbar-name">Bruker</span>
           <span class="role-badge" id="topbar-role">GJEST</span>
         </div>
-        <button id="theme-toggle" class="icon-btn" type="button" title="Bytt tema">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1a6 6 0 100 12A6 6 0 007 1z" stroke="#7a8fa8" stroke-width="1.2"></path><path d="M7 1v12M1 7h12" stroke="#7a8fa8" stroke-width="1.2" opacity=".3"></path></svg>
+        <button id="theme-toggle" class="icon-btn" type="button" title="Bytt til lys modus" aria-label="Bytt til lys modus">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1a6 6 0 100 12A6 6 0 007 1z" stroke="currentColor" stroke-width="1.2"></path><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.2" opacity=".3"></path></svg>
         </button>
         <button id="logout-btn" class="logout-btn" type="button">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h3" stroke="#ef4444" stroke-width="1.2" stroke-linecap="round"></path><path d="M9 9.5l3-3-3-3M5 6.5h7" stroke="#ef4444" stroke-width="1.2" stroke-linecap="round"></path></svg>
@@ -167,7 +167,7 @@
             <span>Alarmstatus</span>
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.5 1a4.5 4.5 0 014.5 4.5c0 3.5-1.5 4.5-1.5 7H5C5 10 3.5 9 3.5 5.5A4.5 4.5 0 017.5 1z" stroke="#ef4444" stroke-width="1.2"></path><path d="M5.5 12h4" stroke="#ef4444" stroke-width="1.2" stroke-linecap="round"></path></svg>
           </div>
-          <div class="stat-value alarm" id="alarm-status">AKTIVERT</div>
+          <div class="stat-value alarm" id="alarm-status">Aktivert</div>
           <div class="stat-sub" id="alarm-sub">Ingen alarmhendelser registrert</div>
         </div>
         <div class="stat-card blue">
@@ -178,7 +178,7 @@
           <div class="stat-value blue" id="last-unlock">-</div>
           <div class="stat-sub" id="last-unlock-sub">Ingen opplåsinger registrert</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card gray">
           <div class="stat-label">
             <span>Sist alarm deaktivert</span>
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5" stroke="#3a4f68" stroke-width="1.2"></circle><path d="M5 5l5 5M10 5l-5 5" stroke="#3a4f68" stroke-width="1.2" stroke-linecap="round"></path></svg>
@@ -188,7 +188,7 @@
         </div>
         <div class="stat-card green">
           <div class="stat-label">
-            <span>Hendelser (24t)</span>
+            <span>Hendelser siste 24 timer</span>
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><polyline points="1,11 4,6 7,9 10,3 14,7" stroke="#22c55e" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
           </div>
           <div class="stat-value green" id="event-count">0</div>

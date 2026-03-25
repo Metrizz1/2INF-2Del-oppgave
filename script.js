@@ -83,6 +83,7 @@ const DOM = {
 };
 
 const TOKEN_KEY = "sa_token";
+const THEME_KEY = "sa_theme";
 const PAGE_IDS = ["dashboard", "log", "users", "admin"];
 const ACTION_META = {
   unlock_door: { label: "Låste opp dør", badgeClass: "unlock", badgeText: "opplåst" },
@@ -112,6 +113,12 @@ const storage = {
   },
   clearToken() {
     localStorage.removeItem(TOKEN_KEY);
+  },
+  getTheme() {
+    return localStorage.getItem(THEME_KEY);
+  },
+  setTheme(theme) {
+    localStorage.setItem(THEME_KEY, theme);
   }
 };
 
@@ -289,8 +296,36 @@ function actionBadge(action) {
   return ACTION_META[normalizeAction(action)];
 }
 
+function themeIcon(theme) {
+  if (theme === "light") {
+    return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.2"></circle><path d="M7 1.2v1.4M7 11.4v1.4M1.2 7h1.4M11.4 7h1.4M2.9 2.9l1 1M10.1 10.1l1 1M11.1 2.9l-1 1M3.9 10.1l-1 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg>`;
+  }
+
+  return `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M9.9 1.4A5.7 5.7 0 108.7 12.6 5.3 5.3 0 019.9 1.4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"></path></svg>`;
+}
+
+function applyTheme(theme) {
+  const safeTheme = theme === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = safeTheme;
+  storage.setTheme(safeTheme);
+
+  DOM.themeToggle.innerHTML = themeIcon(safeTheme);
+  DOM.themeToggle.title = safeTheme === "light" ? "Bytt til mørk modus" : "Bytt til lys modus";
+  DOM.themeToggle.setAttribute("aria-label", DOM.themeToggle.title);
+}
+
+function toggleTheme() {
+  const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  applyTheme(nextTheme);
+}
+
+function initTheme() {
+  const savedTheme = storage.getTheme();
+  applyTheme(savedTheme === "light" ? "light" : "dark");
+}
+
 function joinMeta(parts) {
-  return parts.filter(Boolean).join(" | ");
+  return parts.filter(Boolean).join(", ");
 }
 
 function fmtTime(ts) {
@@ -428,15 +463,15 @@ function renderDashboard() {
 
   if (lastAlarmChange) {
     const isActive = lastAlarmChange.action === "activate_alarm";
-    DOM.alarmStatus.textContent = isActive ? "AKTIVERT" : "DEAKTIVERT";
+    DOM.alarmStatus.textContent = isActive ? "Aktivert" : "Deaktivert";
     DOM.alarmStatus.style.color = isActive ? "var(--red)" : "var(--green)";
     DOM.alarmSub.textContent = joinMeta([
       `${isActive ? "Aktivert" : "Deaktivert"} av ${lastAlarmChange.name}`,
       lastAlarmChange.room,
-      `${fmtDate(lastAlarmChange.ts)} ${fmtTime(lastAlarmChange.ts)}`
+      `${fmtDate(lastAlarmChange.ts)} kl. ${fmtTime(lastAlarmChange.ts)}`
     ]);
   } else {
-    DOM.alarmStatus.textContent = "UKJENT";
+    DOM.alarmStatus.textContent = "Ukjent";
     DOM.alarmStatus.style.color = "var(--hint)";
     DOM.alarmSub.textContent = "Ingen alarmhendelser registrert";
   }
@@ -453,7 +488,7 @@ function renderFeed(events) {
   DOM.eventsFeed.innerHTML = events
     .map((event) => {
       const badge = actionBadge(event.action);
-      return `<div class="event-item">
+      return `<div class="event-item action-${escapeHtml(normalizeAction(event.action))}">
         <div class="avatar">${escapeHtml(initialsFor(event.name))}</div>
         <div class="event-body">
           <div class="event-top">
@@ -935,7 +970,7 @@ function bindEvents() {
     button.addEventListener("click", () => togglePassword(button));
   });
 
-  DOM.themeToggle.addEventListener("click", () => toast("Lys modus er ikke tilgjengelig ennå.", "success"));
+  DOM.themeToggle.addEventListener("click", toggleTheme);
   DOM.logoutBtn.addEventListener("click", handleLogout);
 
   DOM.navItems.forEach((item) => {
@@ -968,6 +1003,7 @@ function bindEvents() {
 }
 
 async function init() {
+  initTheme();
   bindEvents();
   await restoreSession();
 }
